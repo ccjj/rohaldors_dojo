@@ -6,4 +6,4 @@ Add new entities with "+".
 Remove selected entities with "-".
 Add more actions for the selected entity in this round by increasing the number in the "ACTIONS"-column.
 
-###Download: https://github.com/ccjj/rohaldors_dojo/blob/master/dist/easykampf.jar
+###Download: https://github.com/ccjj/rohaldors_dojo/tree/master/dist/easykampf.jar
