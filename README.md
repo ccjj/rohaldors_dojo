@@ -4,6 +4,6 @@ A simple tool for keeping track of battle-phases in the pen&paper game "DSA".
 Usage:
 Add new entities with "+".
 Remove selected entities with "-".
-Add more actions for the selected entity in this round by increasing the number in the "ACTIONS"-column.
+Add more actions for the selected entity in this round by increasing the number in the "BONUSAKTIONEN"-column.
 
 ###Download: https://raw.github.com/ccjj/rohaldors_dojo/master/dist/easykampf.jar
