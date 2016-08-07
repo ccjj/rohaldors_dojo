@@ -18,8 +18,28 @@ public class Person implements Serializable, Cloneable {
     private int AT, PA, INI, RS, LP, MAXLP, WUNDEN, WS, ASP, WUNDENOLD, LPFAKTOROLD, ISTMP, AKTIONEN = 0;
     private int ALLY = 1;
     private String NAME = "";
-    private Color color = new Color(110, 230, 110);
+    private Color color = new Color(110, 230, 110); //ALLY DEFAULT
 
+    
+    public Person(String NAME, int AT, int PA, int INI, int RS, int LP, int MAXLP, int WUNDEN, int WS, int ASP, int ALLY, int BONUSAKTIONEN){
+        this.NAME = NAME;
+        this.AT = AT;
+        this.PA = PA;
+        this.INI = INI;
+        this.RS = RS;
+        this.LP = LP;
+        this.MAXLP = MAXLP;
+        this.WUNDEN = WUNDEN;
+        this.WS = WS;
+        this.ASP = ASP;
+        this.ALLY = ALLY;
+        this.AKTIONEN = BONUSAKTIONEN;
+    }
+    
+    public Person(){
+        
+    }
+    
     /**
      * @return the AT
      */

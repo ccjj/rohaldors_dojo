@@ -9,6 +9,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -168,6 +171,33 @@ public class GUI {
                 } else if (e.getKeyChar() == '+') {
                     PersonCollection.getInstance().addPerson();
                 }
+                
+                     else  if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+                         String data = null;
+                    try { 
+                        data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+                    } catch (UnsupportedFlavorException | IOException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if(data == null)
+                        return;
+                    String[] parts = data.split("\\t");
+                    if(parts.length != 12)
+                        return;
+                    
+                    String pName = parts[0];
+                    ArrayList<Integer> cData = new ArrayList<>();
+                    for(int i = 1; i < parts.length; i++){
+                        //alle zeilen außer dem namen sind vollzahlen. todo columnnamen mit type?
+                        if(!isInteger(parts[i])){
+                            return;
+                        }
+                        cData.add(Integer.parseInt(parts[i]));
+                    }
+                    Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10));
+                    PersonCollection.getInstance().addPerson(p);
+                    updatePersonModel();
+                }
 
             }
 
@@ -257,5 +287,18 @@ public class GUI {
         });
 
     }
+    
+    //todo move
+    public static boolean isInteger(String s) {
+    try { 
+        Integer.parseInt(s); 
+    } catch(NumberFormatException e) { 
+        return false; 
+    } catch(NullPointerException e) {
+        return false;
+    }
+    // only got here if we didn't return false
+    return true;
+}
 
 }
