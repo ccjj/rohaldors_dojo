@@ -140,19 +140,19 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         } else if (4 == columnIndex) {
             hasChanged = row.setBASEINI(value);
         } else if (5 == columnIndex) {
-           hasChanged =  row.setRS(value);
+            hasChanged = row.setRS(value);
         } else if (6 == columnIndex) {
             hasChanged = row.setLP(value);
         } else if (7 == columnIndex) {
             hasChanged = row.setMAXLP(value);
         } else if (8 == columnIndex) {
-           hasChanged =  row.setWUNDEN(value);
+            hasChanged = row.setWUNDEN(value);
         } else if (9 == columnIndex) {
-           hasChanged =  row.setWS(value);
+            hasChanged = row.setWS(value);
         } else if (10 == columnIndex) {
             hasChanged = row.setASP(value);
         } else if (11 == columnIndex) {
-           hasChanged =  row.setALLY(value);
+            hasChanged = row.setALLY(value);
         } else if (12 == columnIndex) {
             try {
                 int aktionen = Integer.parseInt(value.toString());
@@ -162,10 +162,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             } finally {
                 return;
             }
-
         }
-        
-        if(hasChanged){
+
+        if (hasChanged) {
             String msg = row.getNAME() + ": " + columnNames[columnIndex] + ": von " + oldVal + " auf " + value.toString() + " geändert";
             TextLogger.getInstance().add(msg);
         }
@@ -244,4 +243,11 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         return persons.get(selectedRow);
     }
 
+    //todo refactor
+    private void callTypeByColumn(int colNum) {
+        Class<?> a = getColumnClass(colNum);
+        if (a.isInstance(Integer.class)) {
+            return;
+        }
+    }
 }

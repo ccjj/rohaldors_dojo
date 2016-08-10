@@ -62,7 +62,7 @@ public class ErinnerungCollection extends AbstractListModel{
     
 
     public void clear(){
-        this.erinnerungen = new ArrayList<>();
+        this.erinnerungen.clear();
     }
     
     @Override
