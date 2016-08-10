@@ -232,7 +232,7 @@ public class GUI extends javax.swing.JFrame {
         erinnerungField.setHint("Erinnerung hier setzen"); 
         erinnerungInput.setText("1");
 
-        erinnerungButton.setText("Erinnern in Runden:");
+        erinnerungButton.setText("Erinnern in Runden");
 
         textLog.setText("Runde 1");
         textLog.setEditable(false);
