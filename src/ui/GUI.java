@@ -11,6 +11,7 @@ import easykampf.Version;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Insets;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -27,11 +28,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
+import javax.swing.JTextPane;
 import javax.swing.RowSorter;
 
 import javax.swing.SortOrder;
@@ -57,7 +61,7 @@ public class GUI extends javax.swing.JFrame {
 
     Font font = new Font("Courier", Font.PLAIN, 16);
     Font boldFont = new Font("Courier", Font.BOLD, 16);
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify
     private javax.swing.JButton calcDmgButton;
     private javax.swing.JTextField dmgInput;
     private javax.swing.JLabel dmgLabel;
@@ -78,6 +82,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton addSavedPersonButton;
     private javax.swing.JButton savePersonButton;
     private javax.swing.JButton redoButton;
+     private javax.swing.JButton helpButton;
     private javax.swing.JButton resetRoundButton;
     private javax.swing.JLabel roundLabel;
     private javax.swing.JTextField rundenInput;
@@ -94,7 +99,7 @@ public class GUI extends javax.swing.JFrame {
 
     javax.swing.JScrollPane jScrollPane3;
 
-    // End of variables declaration  
+    // End of variables declaration
     /**
      * Creates new form NewJFrame
      */
@@ -183,15 +188,17 @@ public class GUI extends javax.swing.JFrame {
         savedPersonLabel = new javax.swing.JLabel();
         saveSavedPersonButton = new javax.swing.JButton();
         loadSavedPersonButton = new javax.swing.JButton();
+        helpButton = new JButton();
+        helpButton.setText("?");
+        helpButton.setMargin(new Insets(0, 0, 0, 0));
         jSeparator4 = new javax.swing.JSeparator();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Rohaldors Dojo");
 
         //logger = new TextLogger(textLog);
-
         undoButton.setVisible(false);
         redoButton.setVisible(false);
-        
+
         TextLogger.getInstance().setTextField(textLog);
         jScrollPane2.setViewportView(table);
 
@@ -226,10 +233,9 @@ public class GUI extends javax.swing.JFrame {
         saveButton.setText("Kampf speichern");
 
         loadButton.setText("Kampf laden");
- 
-        //loadButton.setSize(saveButton.getSize());
 
-        erinnerungField.setHint("Erinnerung hier setzen"); 
+        //loadButton.setSize(saveButton.getSize());
+        erinnerungField.setHint("Erinnerung hier setzen");
         erinnerungInput.setText("1");
 
         erinnerungButton.setText("Erinnern in Runden");
@@ -247,7 +253,7 @@ public class GUI extends javax.swing.JFrame {
 
         savePersonButton.setText("→");
 
-      javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -255,12 +261,12 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(erinnerungField)
+                        .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 759, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(erinnerungButton)
-                        .addGap(79, 79, 79))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -293,6 +299,12 @@ public class GUI extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(savedPersonLabel)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(dmgLabel)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jSeparator2)
                                     .addComponent(jScrollPane4)
@@ -305,29 +317,25 @@ public class GUI extends javax.swing.JFrame {
                                                 .addGap(59, 59, 59)
                                                 .addComponent(dmgInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(saveSavedPersonButton)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(loadSavedPersonButton))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
                                                 .addGap(8, 8, 8)
                                                 .addComponent(addSavedPersonButton)
                                                 .addGap(7, 7, 7)
                                                 .addComponent(savePersonButton)))
-                                        .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(undoButton)
-                                .addGap(18, 18, 18)
-                                .addComponent(redoButton)
-                                .addGap(50, 50, 50)
-                                .addComponent(versionLabel)
-                                .addGap(28, 28, 28))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(savedPersonLabel)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(dmgLabel)
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(undoButton)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(redoButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(versionLabel)
+                                        .addGap(32, 32, 32)
+                                        .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(saveSavedPersonButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(loadSavedPersonButton)))
+                                .addContainerGap())))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(82, 82, 82)
                         .addComponent(rundenInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -370,9 +378,7 @@ public class GUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(loadSavedPersonButton)
-                            .addComponent(saveSavedPersonButton))
+                        .addComponent(saveSavedPersonButton)
                         .addContainerGap(39, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -385,19 +391,21 @@ public class GUI extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(erinnerungButton)
-                                        .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(redoButton)
-                                        .addComponent(undoButton))))
+                                .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(saveButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(loadButton)))
+                                .addComponent(loadButton))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(loadSavedPersonButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(redoButton)
+                                    .addComponent(undoButton)
+                                    .addComponent(erinnerungButton)
+                                    .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(helpButton))))
                         .addGap(11, 11, 11))))
         );
 
@@ -419,7 +427,7 @@ public class GUI extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>                        
+    }// </editor-fold>
 
     /**
      * @param args the command line arguments
@@ -434,55 +442,105 @@ public class GUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GUI().setVisible(true);
+                GUI g = new GUI();
+                g.setVisible(true);
+                g.setResizable(false);
             }
         });
     }
 
-    
-    private boolean couldPastePerson(String data){
-                            String[] parts = data.split("\\t");
-                    if (parts.length != personCollection.getColumnCount()) {
-                        return false;
-                    }
+    private boolean couldPastePerson(String data) {
+        String[] parts = data.split("\\t");
+        if (parts.length != personCollection.getColumnCount()) {
+            return false;
+        }
 
-                    String pName = parts[0];
-                    ArrayList<Integer> cData = new ArrayList<>();
-                    for (int i = 1; i < parts.length; i++) {
-                        //alle zeilen außer dem namen sind vollzahlen. todo getColumnClass
-                        if (!isInteger(parts[i])) {
-                            return false;
-                        }
-                        cData.add(Integer.parseInt(parts[i]));
-                    }
-                    Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11));
-                    personCollection.addPerson(p);
-                    updatePersonModel();
+        String pName = parts[0];
+        ArrayList<Integer> cData = new ArrayList<>();
+        for (int i = 1; i < parts.length; i++) {
+            //alle zeilen außer dem namen sind vollzahlen. todo getColumnClass
+            if (!isInteger(parts[i])) {
+                return false;
+            }
+            cData.add(Integer.parseInt(parts[i]));
+        }
+        Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11));
+        personCollection.addPerson(p);
+        updatePersonModel();
         return true;
-        
-        
+
     }
-    
-    
+
     private void updatePersonModel() {
         personCollection.fireTableDataChanged();
     }
 
-             private void deleteSavedPersons() {
-                int[] selectedRows = savedPersonList.getSelectedIndices();
+    private void showHelpFrame(){
+        String help = "<html><style>\n" +
+"	.demo {\n" +
+"		width:100%;\n" +
+"	}\n" +
+"</style>\n" +
+"<table class=\"demo\">\n" +
+"	<caption><b>About</b></caption>\n" +
+"	<thead>\n" +
+"	<tr>\n" +
+"		<th>Shortkeys:</th>\n" +
+"		<th><br></th>\n" +
+"	</tr>\n" +
+"	</thead>\n" +
+"	<tbody>\n" +
+"	<tr>\n" +
+"		<td><b>Ctrl + C</b><br></td>\n" +
+"		<td>&nbsp;<i>Copy the selected entities to clipboard (Table only).</i></td>\n" +
+"	</tr>\n" +
+"	<tr>\n" +
+"		<td>&nbsp;<b>Ctrl + V</b><br></td>\n" +
+"		<td>&nbsp;<i>Paste the selected entities from clipboard (Table only) . It is even possible to paste data from Excel or from a textfile, as long as the rows are seperated by newlines, the data is seperated by tabulators, the values are valid, and the amount of columns is the same as in the table.</i><br></td>\n" +
+"	</tr>\n" +
+"	<tr>\n" +
+"		<td>&nbsp;<b>+</b></td>\n" +
+"		<td>&nbsp;<i>Add a new entity (Table only).</i><br></td>\n" +
+"	</tr>\n" +
+"	<tr>\n" +
+"		<td>&nbsp;<b>-</b></td>\n" +
+"		<td>&nbsp;<i>Delete an entity.</i><br></td>\n" +
+"	</tr>\n" +
+"	<tbody>\n" +
+"</table>\n\nFor Wahnfried. He was the best of us.</html>";
+        
+        
+         final JFrame detailFrame = new JFrame("Help");
+        detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        detailFrame.setSize(300, 400);
+        detailFrame.setResizable(false);
+        Box contentBox = Box.createVerticalBox();
+        JTextPane contentPane = new JTextPane();
+        contentPane.setContentType("text/html");
+        contentPane.setEditable(false);
+        contentPane.setText(help);
+        contentBox.add(contentPane);
+        detailFrame.add(contentBox);
+        contentPane.setBackground(UIManager.getColor("Label.background"));
+        detailFrame.setVisible(true);
+        
+    }
+    
+    private void deleteSavedPersons() {
+        int[] selectedRows = savedPersonList.getSelectedIndices();
 
-                if (selectedRows.length == 0) {
-                    return;
-                }
+        if (selectedRows.length == 0) {
+            return;
+        }
 
-                for (int i = selectedRows.length - 1; i >= 0; i--) {
-                    //int selectedRow = table.convertRowIndexToModel(selectedRows[i]);
-                    savedPersonsCollection.removePerson(selectedRows[i]);
-                }
+        for (int i = selectedRows.length - 1; i >= 0; i--) {
+            //int selectedRow = table.convertRowIndexToModel(selectedRows[i]);
+            savedPersonsCollection.removePerson(selectedRows[i]);
+        }
 
-                updateSavedPersonListModel();
-            }
-                
+        updateSavedPersonListModel();
+    }
+
     public void updateSavedPersonListModel() {
         //fireContentsChanged(savedPersonsCollection, 1, 1);
         DefaultListModel model = new DefaultListModel();
@@ -537,17 +595,16 @@ public class GUI extends javax.swing.JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                
+
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                
+
             }
 
-
         });
-        
+
         table.addKeyListener(new KeyListener() {
 
             @Override
@@ -571,9 +628,10 @@ public class GUI extends javax.swing.JFrame {
                         return;
                     }
                     String[] lines = data.split("\\n");
-                    for(String line : lines){
-                        if (!couldPastePerson(line))
+                    for (String line : lines) {
+                        if (!couldPastePerson(line)) {
                             return;
+                        }
                     }
                 }
 
@@ -605,6 +663,14 @@ public class GUI extends javax.swing.JFrame {
 
         });
 
+        helpButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showHelpFrame();
+            }
+        });
+        
         savePersonButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
@@ -720,8 +786,9 @@ public class GUI extends javax.swing.JFrame {
         erinnerungButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String s = erinnerungField.getText();
-                if(s == null || s.isEmpty())
+                if (s == null || s.isEmpty()) {
                     return;
+                }
                 String input = erinnerungInput.getText();
                 int r;
                 try {
@@ -745,8 +812,8 @@ public class GUI extends javax.swing.JFrame {
                 personCollection.removeTmpPersons();
                 updatePersonModel();
                 TextLogger.getInstance().add("Runde " + Integer.toString(round));
-                ArrayList<String> er =  ErinnerungCollection.getInstance().getErinnerungFromRunde(round);
-                for(String s : er){
+                ArrayList<String> er = ErinnerungCollection.getInstance().getErinnerungFromRunde(round);
+                for (String s : er) {
                     TextLogger.getInstance().add("Erinnerung: " + s);
                     //textLog.setText("Erinnerung: " + s + "\n");
                 }
@@ -770,9 +837,8 @@ public class GUI extends javax.swing.JFrame {
 
     }
 
-    //TODO erinnerungen zurücksetzen bei runden zurücksetzen
-    // bei nächster runde, erinnerungen -1 anzeigen
-    // liste für erinnerungen
+
+    // liste für erinnerungen anzeigen todo
     public void addErinnerung(int totalrunden, String msg) {
         //textLog.setText(Integer.toString(runden)); //TODO round umbenennen
         ErinnerungCollection.getInstance().add(totalrunden, msg);
