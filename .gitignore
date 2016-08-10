@@ -43,3 +43,4 @@ kampf.ser
 manifest.mf
 *.netbeans_automatic_build
 dist/README.TXT
+*.ser
