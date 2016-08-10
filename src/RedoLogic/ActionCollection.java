@@ -4,17 +4,12 @@
  * and open the template in the editor.
  */
 
-package easykampf;
+package RedoLogic;
 
 /**
  * 
  * @author Omar
  */
-public class Version {
-    private static String version = "v 0.3";
-    
-    public static String getVersion(){
-        return version;
-    }
+public class ActionCollection {
 
 }

@@ -7,4 +7,4 @@ Remove selected entities with "-".
 You can copy/paste entities with Control + C or Control + V respectively.
 Add more actions for the selected entity in this round by increasing the number in the "BONUSAKTIONEN"-column.
 
-###Download: https://raw.github.com/ccjj/rohaldors_dojo/master/dist/easykampf.jar
+###Download: https://raw.github.com/ccjj/rohaldors_dojo/master/dist/rohaldors-dojo.jar

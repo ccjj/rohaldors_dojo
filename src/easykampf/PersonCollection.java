@@ -21,11 +21,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class PersonCollection extends AbstractTableModel implements Serializable {
 
-    public static ArrayList<Person> persons = new ArrayList<>();
-    private static PersonCollection instance;
-    private static final long serialVersionUID = 2L;
-    private final String[] columnNames;
-    //todo old aktionen val, array of clones?
+    private static PersonCollection instance = null;
 
     public static PersonCollection getInstance() {
         if (instance == null) {
@@ -34,9 +30,15 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         return instance;
     }
 
+    public static ArrayList<Person> persons;
+    private final long serialVersionUID = 2L;
+    private final String[] columnNames;
+    //todo old aktionen val, array of clones?
+
     public PersonCollection() {
+        persons = new ArrayList<Person>();
         this.columnNames = new String[]{
-            "NAME", "AT", "PA", "INI", "RS", "LP", "MAXLP", "WUNDEN", "WS", "ASP", "ALLY", "BONUSAKTIONEN"
+            "NAME", "AT", "PA", "INI", "BASEINI", "RS", "LP", "MAXLP", "WUNDEN", "WS", "ASP", "ALLY", "BONUSAKTIONEN"
         };
     }
 
@@ -90,20 +92,22 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         } else if (3 == columnIndex) {
             return row.getINI();
         } else if (4 == columnIndex) {
-            return row.getRS();
+            return row.getBASEINI();
         } else if (5 == columnIndex) {
-            return row.getLP();
+            return row.getRS();
         } else if (6 == columnIndex) {
-            return row.getMAXLP();
+            return row.getLP();
         } else if (7 == columnIndex) {
-            return row.getWUNDEN();
+            return row.getMAXLP();
         } else if (8 == columnIndex) {
-            return row.getWS();
+            return row.getWUNDEN();
         } else if (9 == columnIndex) {
-            return row.getASP();
+            return row.getWS();
         } else if (10 == columnIndex) {
-            return row.getALLY();
+            return row.getASP();
         } else if (11 == columnIndex) {
+            return row.getALLY();
+        } else if (12 == columnIndex) {
             return row.getAKTIONEN();
         }
         return null;
@@ -116,6 +120,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        boolean hasChanged = false;
         Person row = persons.get(rowIndex);
         System.out.println(row.getISTMP());
         if (row.getISTMP() > 0 && columnIndex != 3) {
@@ -123,28 +128,30 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         }
 
         if (0 == columnIndex) {
-            row.setNAME(value);
+            hasChanged = row.setNAME(value);
         } else if (1 == columnIndex) {
-            row.setAT(value);
+            hasChanged = row.setAT(value);
         } else if (2 == columnIndex) {
-            row.setPA(value);
+            hasChanged = row.setPA(value);
         } else if (3 == columnIndex) {
-            row.setINI(value);
+            hasChanged = row.setINI(value);
         } else if (4 == columnIndex) {
-            row.setRS(value);
+            hasChanged = row.setBASEINI(value);
         } else if (5 == columnIndex) {
-            row.setLP(value);
+           hasChanged =  row.setRS(value);
         } else if (6 == columnIndex) {
-            row.setMAXLP(value);
+            row.setLP(value);
         } else if (7 == columnIndex) {
-            row.setWUNDEN(value);
+            hasChanged = row.setMAXLP(value);
         } else if (8 == columnIndex) {
-            row.setWS(value);
+           hasChanged =  row.setWUNDEN(value);
         } else if (9 == columnIndex) {
-            row.setASP(value);
+           hasChanged =  row.setWS(value);
         } else if (10 == columnIndex) {
-            row.setALLY(value);
+            hasChanged = row.setASP(value);
         } else if (11 == columnIndex) {
+           hasChanged =  row.setALLY(value);
+        } else if (12 == columnIndex) {
             try {
                 int aktionen = Integer.parseInt(value.toString());
                 row.setAKTIONEN(aktionen);
@@ -155,7 +162,10 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             }
 
         }
-
+        
+        if(hasChanged){
+            
+        }
         fireTableCellUpdated(rowIndex, columnIndex);
 
     }
@@ -166,18 +176,18 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         return true;
     }
 
-    Color getRowColour(int rowIndex) {
+    public Color getRowColour(int rowIndex) {
         Person row = persons.get(rowIndex);
         return row.getColor();
     }
 
-    void applyPersonDmg(int selectedRow, int dmg, boolean selected) {
+    public void applyPersonDmg(int selectedRow, int dmg, boolean ignoreWS, boolean ignoreRS) {
         Person row = persons.get(selectedRow);
-        row.applyDmg(dmg, selected);
+        row.applyDmg(dmg, ignoreWS, ignoreRS);
         fireTableRowsUpdated(selectedRow, selectedRow);
     }
 
-    void removePerson(int selectedRow) {
+    public void removePerson(int selectedRow) {
         Person row = persons.get(selectedRow);
         persons.remove(row);
         fireTableRowsDeleted(selectedRow, selectedRow);
@@ -196,11 +206,11 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 Person c = (Person) row.clone();
                 c.setTMP();
                 c.setNAME(row.getNAME() + " Aktion " + Integer.toString(a));
-                PersonCollection.getInstance().addPerson(c);
+                this.addPerson(c);
             }
 
         } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         fireTableDataChanged();
     }
@@ -215,6 +225,20 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 p.setAKTIONEN(0);
             }
         }
+    }
+
+    @Override
+    public Class<?> getColumnClass(int colNum) {
+        switch (colNum) {
+            case 0:
+                return String.class;
+            default:
+                return Integer.class;
+        }
+    }
+
+    public Person getPerson(int selectedRow) {
+        return persons.get(selectedRow);
     }
 
 }

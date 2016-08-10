@@ -1,4 +1,4 @@
-package easykampf;
+package io;
 
 import java.io.*;
 

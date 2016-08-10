@@ -15,17 +15,17 @@ import java.io.Serializable;
 public class Person implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 2L;
-    private int AT, PA, INI, RS, LP, MAXLP, WUNDEN, WS, ASP, WUNDENOLD, LPFAKTOROLD, ISTMP, AKTIONEN = 0;
+    private int AT, PA, INI, BASEINI, RS, LP, MAXLP, WUNDEN, WS, ASP, WUNDENOLD, LPFAKTOROLD, ISTMP, AKTIONEN = 0;
     private int ALLY = 1;
     private String NAME = "";
     private Color color = new Color(110, 230, 110); //ALLY DEFAULT
 
-    
-    public Person(String NAME, int AT, int PA, int INI, int RS, int LP, int MAXLP, int WUNDEN, int WS, int ASP, int ALLY, int BONUSAKTIONEN){
+    public Person(String NAME, int AT, int PA, int INI, int BASEINI, int RS, int LP, int MAXLP, int WUNDEN, int WS, int ASP, int ALLY, int BONUSAKTIONEN) {
         this.NAME = NAME;
         this.AT = AT;
         this.PA = PA;
         this.INI = INI;
+        this.BASEINI = BASEINI;
         this.RS = RS;
         this.LP = LP;
         this.MAXLP = MAXLP;
@@ -34,12 +34,13 @@ public class Person implements Serializable, Cloneable {
         this.ASP = ASP;
         this.ALLY = ALLY;
         this.AKTIONEN = BONUSAKTIONEN;
+        setColorFromType();
     }
-    
-    public Person(){
-        
+
+    public Person() {
+
     }
-    
+
     /**
      * @return the AT
      */
@@ -196,85 +197,99 @@ public class Person implements Serializable, Cloneable {
     /**
      * @param Name the Name to set
      */
-    public void setNAME(String Name) {
+    public boolean setNAME(String Name) {
+        if (this.NAME.equals(Name)) {
+            return false;
+        }
         this.NAME = Name;
+        return true;
     }
 
-    void setAT(Object value) {
+    boolean setAT(Object value) {
         try {
             setAT(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setPA(Object value) {
+    boolean setPA(Object value) {
         try {
             setPA(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setINI(Object value) {
+    boolean setINI(Object value) {
         try {
             setINI(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setRS(Object value) {
+    boolean setRS(Object value) {
         try {
             setRS(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setLP(Object value) {
+    boolean setLP(Object value) {
         try {
             setLP(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setWUNDEN(Object value) {
+    boolean setWUNDEN(Object value) {
         try {
             setWUNDEN(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setWS(Object value) {
+    boolean setWS(Object value) {
         try {
             setWS(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setASP(Object value) {
+    boolean setASP(Object value) {
         try {
             setASP(Integer.parseInt(value.toString()));
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setALLY(Object value) {
+    boolean setALLY(Object value) {
         try {
             setALLY(Integer.parseInt(value.toString()));
 
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
-    void setNAME(Object value) {
-        setNAME(value.toString());
+    boolean setNAME(Object value) {
+        return setNAME(value.toString());
+
     }
 
     private void setColorFromType() {
@@ -298,8 +313,14 @@ public class Person implements Serializable, Cloneable {
         this.color = c;
     }
 
-    public void applyDmg(int damage, boolean applyWounds) {
-        if (applyWounds) {
+    public void applyDmg(int damage, boolean ignoreWounds, boolean ignoreRS) {
+        if (ignoreRS) {
+            damage = damage - this.getRS();
+            if (damage < 0) {
+                damage = 0;
+            }
+        }
+        if (ignoreWounds) {
             int wounds = damage / getWS(); //Math.floor
             if (wounds > 0) {
                 setWUNDEN(getWUNDEN() + wounds);
@@ -322,13 +343,14 @@ public class Person implements Serializable, Cloneable {
         this.MAXLP = MAXLP;
     }
 
-    void setMAXLP(Object value) {
+    boolean setMAXLP(Object value) {
         try {
             setMAXLP(Integer.parseInt(value.toString()));
 
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
     /**
@@ -345,13 +367,14 @@ public class Person implements Serializable, Cloneable {
         this.AKTIONEN = AKTIONEN;
     }
 
-    public void setAKTIONEN(Object value) {
+    boolean setAKTIONEN(Object value) {
         try {
             setAKTIONEN(Integer.parseInt(value.toString()));
 
         } catch (Exception e) {
-
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -376,6 +399,35 @@ public class Person implements Serializable, Cloneable {
      */
     public void setISTMP(int ISTMP) {
         this.ISTMP = ISTMP;
+    }
+
+    @Override
+    public String toString() {
+        return this.getNAME() + ", LP: " + this.getLP();
+    }
+
+    /**
+     * @return the BASEINI
+     */
+    public int getBASEINI() {
+        return BASEINI;
+    }
+
+    /**
+     * @param BASEINI the BASEINI to set
+     */
+    public void setBASEINI(int BASEINI) {
+        this.BASEINI = BASEINI;
+    }
+
+    boolean setBASEINI(Object value) {
+        try {
+            setBASEINI(Integer.parseInt(value.toString()));
+
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
 }
