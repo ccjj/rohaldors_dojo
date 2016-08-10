@@ -62,7 +62,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextField dmgInput;
     private javax.swing.JLabel dmgLabel;
     private javax.swing.JButton erinnerungButton;
-    private javax.swing.JTextField erinnerungField;
+    HintTextField erinnerungField;
     private javax.swing.JTextField erinnerungInput;
     private javax.swing.JCheckBox ignoreRS;
     private javax.swing.JCheckBox ignoreWS;
@@ -170,7 +170,7 @@ public class GUI extends javax.swing.JFrame {
         savedPersonList = new javax.swing.JList();
         saveButton = new javax.swing.JButton();
         loadButton = new javax.swing.JButton();
-        erinnerungField = new javax.swing.JTextField();
+        erinnerungField = new HintTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         erinnerungInput = new javax.swing.JTextField(2);
@@ -229,8 +229,7 @@ public class GUI extends javax.swing.JFrame {
  
         //loadButton.setSize(saveButton.getSize());
 
-        erinnerungField.setText("Erinnerungstext hier setzen");
-
+        erinnerungField.setHint("Erinnerung hier setzen"); 
         erinnerungInput.setText("1");
 
         erinnerungButton.setText("Erinnern in Runden:");
