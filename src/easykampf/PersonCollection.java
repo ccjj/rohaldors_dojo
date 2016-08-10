@@ -165,7 +165,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         }
 
         if (hasChanged) {
-            String msg = row.getNAME() + ": " + columnNames[columnIndex] + ": von " + oldVal + " auf " + value.toString() + " geändert";
+            String msg = row.getNAME() + " " + columnNames[columnIndex] + ": von " + oldVal + " auf " + value.toString() + " geändert";
             TextLogger.getInstance().add(msg);
         }
         fireTableCellUpdated(rowIndex, columnIndex);

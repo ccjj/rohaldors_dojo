@@ -443,6 +443,21 @@ public class GUI extends javax.swing.JFrame {
         personCollection.fireTableDataChanged();
     }
 
+             private void deleteSavedPersons() {
+                int[] selectedRows = savedPersonList.getSelectedIndices();
+
+                if (selectedRows.length == 0) {
+                    return;
+                }
+
+                for (int i = selectedRows.length - 1; i >= 0; i--) {
+                    //int selectedRow = table.convertRowIndexToModel(selectedRows[i]);
+                    savedPersonsCollection.removePerson(selectedRows[i]);
+                }
+
+                updateSavedPersonListModel();
+            }
+                
     public void updateSavedPersonListModel() {
         //fireContentsChanged(savedPersonsCollection, 1, 1);
         DefaultListModel model = new DefaultListModel();
@@ -486,6 +501,28 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        savedPersonList.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_DELETE || e.getKeyChar() == KeyEvent.VK_MINUS) {
+                    deleteSavedPersons();
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                
+            }
+
+
+        });
+        
         table.addKeyListener(new KeyListener() {
 
             @Override
@@ -557,8 +594,6 @@ public class GUI extends javax.swing.JFrame {
 
         savePersonButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                System.out.println("CC");
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow < 0) {
                     return;
