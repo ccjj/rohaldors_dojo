@@ -439,6 +439,31 @@ public class GUI extends javax.swing.JFrame {
         });
     }
 
+    
+    private boolean couldPastePerson(String data){
+                            String[] parts = data.split("\\t");
+                    if (parts.length != personCollection.getColumnCount()) {
+                        return false;
+                    }
+
+                    String pName = parts[0];
+                    ArrayList<Integer> cData = new ArrayList<>();
+                    for (int i = 1; i < parts.length; i++) {
+                        //alle zeilen außer dem namen sind vollzahlen. todo getColumnClass
+                        if (!isInteger(parts[i])) {
+                            return false;
+                        }
+                        cData.add(Integer.parseInt(parts[i]));
+                    }
+                    Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11));
+                    personCollection.addPerson(p);
+                    updatePersonModel();
+        return true;
+        
+        
+    }
+    
+    
     private void updatePersonModel() {
         personCollection.fireTableDataChanged();
     }
@@ -545,23 +570,11 @@ public class GUI extends javax.swing.JFrame {
                     if (data == null) {
                         return;
                     }
-                    String[] parts = data.split("\\t");
-                    if (parts.length != personCollection.getColumnCount()) {
-                        return;
-                    }
-
-                    String pName = parts[0];
-                    ArrayList<Integer> cData = new ArrayList<>();
-                    for (int i = 1; i < parts.length; i++) {
-                        //alle zeilen außer dem namen sind vollzahlen. todo columnnamen mit type?
-                        if (!isInteger(parts[i])) {
+                    String[] lines = data.split("\\n");
+                    for(String line : lines){
+                        if (!couldPastePerson(line))
                             return;
-                        }
-                        cData.add(Integer.parseInt(parts[i]));
                     }
-                    Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11));
-                    personCollection.addPerson(p);
-                    updatePersonModel();
                 }
 
             }

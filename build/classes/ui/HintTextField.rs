@@ -1,2 +1,0 @@
-ui.HintTextField
-ui.HintTextFieldUI
