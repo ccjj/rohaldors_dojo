@@ -5,6 +5,7 @@
  */
 package easykampf;
 
+import erinnerung.ErinnerungCollection;
 import java.awt.Color;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -121,6 +122,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         boolean hasChanged = false;
+        String oldVal = this.getValueAt(rowIndex, columnIndex).toString();
         Person row = persons.get(rowIndex);
         System.out.println(row.getISTMP());
         if (row.getISTMP() > 0 && columnIndex != 3) {
@@ -140,7 +142,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         } else if (5 == columnIndex) {
            hasChanged =  row.setRS(value);
         } else if (6 == columnIndex) {
-            row.setLP(value);
+            hasChanged = row.setLP(value);
         } else if (7 == columnIndex) {
             hasChanged = row.setMAXLP(value);
         } else if (8 == columnIndex) {
@@ -164,7 +166,8 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         }
         
         if(hasChanged){
-            
+            String msg = row.getNAME() + ": " + columnNames[columnIndex] + ": von " + oldVal + " auf " + value.toString() + " geändert";
+            TextLogger.getInstance().add(msg);
         }
         fireTableCellUpdated(rowIndex, columnIndex);
 

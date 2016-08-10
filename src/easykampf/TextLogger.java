@@ -12,9 +12,19 @@ import javax.swing.JTextArea;
  * @author cje
  */
 public class TextLogger {
+    private static TextLogger instance = null;
     private static JTextArea textLog;
     
-    public TextLogger(JTextArea textLog) {
+    
+    public static TextLogger getInstance(){
+        if(instance == null)
+            instance = new TextLogger();
+        return instance;
+    }
+    
+    private TextLogger(){}
+    
+    public void setTextField(JTextArea textLog) {
         this.textLog = textLog;
     }
     

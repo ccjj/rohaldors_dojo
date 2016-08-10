@@ -10,7 +10,6 @@ import easykampf.TextLogger;
 import easykampf.Version;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Font;
 
 import java.awt.Toolkit;
@@ -18,31 +17,23 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.KeyStroke;
 import javax.swing.RowSorter;
 
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -199,7 +190,9 @@ public class GUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Rohaldors Dojo");
 
-        logger = new TextLogger(textLog);
+        //logger = new TextLogger(textLog);
+        logger = TextLogger.getInstance();
+        logger.setTextField(textLog);
         jScrollPane2.setViewportView(table);
 
         dmgLabel.setText("Schaden");
