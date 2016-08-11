@@ -185,7 +185,10 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     public void applyPersonDmg(int selectedRow, int dmg, boolean ignoreWS, boolean ignoreRS) {
         Person row = persons.get(selectedRow);
-        row.applyDmg(dmg, ignoreWS, ignoreRS);
+        int oldLp = row.getLP();
+        int lpNow = row.applyDmg(dmg, ignoreWS, ignoreRS);
+        String msg = row.getNAME() + " erleidet " + dmg + "Schaden. LP" + ": von " + oldLp + " auf " + lpNow + " geändert";
+        TextLogger.getInstance().add(msg);
         fireTableRowsUpdated(selectedRow, selectedRow);
     }
 

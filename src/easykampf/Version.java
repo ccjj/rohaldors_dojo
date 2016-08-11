@@ -11,7 +11,7 @@ package easykampf;
  * @author Omar
  */
 public class Version {
-    private static String version = "v 0.3";
+    private static String version = "v 0.3.1";
     
     public static String getVersion(){
         return version;

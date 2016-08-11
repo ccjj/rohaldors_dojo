@@ -313,7 +313,7 @@ public class Person implements Serializable, Cloneable {
         this.color = c;
     }
 
-    public void applyDmg(int damage, boolean ignoreWounds, boolean ignoreRS) {
+    public int applyDmg(int damage, boolean ignoreWounds, boolean ignoreRS) {
         if (ignoreRS) {
              damage = damage - this.getRS();
             if (damage < 0) {
@@ -328,7 +328,9 @@ public class Person implements Serializable, Cloneable {
                 }
             }
         }
-        setLP(getLP() - damage);
+        int lpNow = getLP() - damage;
+        setLP(lpNow);
+        return lpNow;
     }
 
     /**
