@@ -315,15 +315,17 @@ public class Person implements Serializable, Cloneable {
 
     public void applyDmg(int damage, boolean ignoreWounds, boolean ignoreRS) {
         if (ignoreRS) {
-            damage = damage - this.getRS();
+             damage = damage - this.getRS();
             if (damage < 0) {
                 damage = 0;
             }
         }
         if (ignoreWounds) {
-            int wounds = damage / getWS(); //Math.floor
-            if (wounds > 0) {
-                setWUNDEN(getWUNDEN() + wounds);
+                if(getWS() != 0){
+                int wounds = damage / getWS(); //Math.floor
+                if (wounds > 0) {
+                    setWUNDEN(getWUNDEN() + wounds);
+                }
             }
         }
         setLP(getLP() - damage);

@@ -8,6 +8,7 @@ import io.Save;
 import easykampf.SavedPersonsCollection;
 import easykampf.TextLogger;
 import easykampf.Version;
+import io.GetImage;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -30,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -438,11 +440,12 @@ public class GUI extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GUI g = new GUI();
+                g.setIconImage(Toolkit.getDefaultToolkit().getImage(GetImage.getImage("list.png")));
                 g.setVisible(true);
                 g.setResizable(false);
             }
