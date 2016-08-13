@@ -407,7 +407,7 @@ public class Person implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return this.getNAME() + ", LP: " + this.getLP();
+        return this.getNAME() + ", MAXLP: " + this.getMAXLP() + ", BASEINI: " + this.getBASEINI() + ", RS: " + this.getRS();
     }
 
     /**

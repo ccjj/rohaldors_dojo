@@ -5,15 +5,10 @@
  */
 package easykampf;
 
-import erinnerung.ErinnerungCollection;
 import java.awt.Color;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -24,14 +19,15 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     private static PersonCollection instance = null;
 
+
+    public static ArrayList<Person> persons;
+
     public static PersonCollection getInstance() {
         if (instance == null) {
             instance = new PersonCollection();
         }
         return instance;
     }
-
-    public static ArrayList<Person> persons;
     private final long serialVersionUID = 2L;
     private final String[] columnNames;
     //todo old aktionen val, array of clones?

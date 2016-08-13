@@ -14,16 +14,16 @@ import javax.swing.AbstractListModel;
  * 
  * @author Omar
  */
-public class SavedPersonsCollection extends AbstractListModel implements Serializable {
+public class SavedPersonCollection extends AbstractListModel implements Serializable {
     
     private static final long serialVersionUID = 2L;
-    
+
     public static ArrayList<Person> persons = new ArrayList<>();
     
     public void addPerson() {
         Person p = new Person();
         persons.add(p);
-
+        //this.fireContentsChanged(this, persons.size()-1, persons.size()-1);
     }
         
     public void removePerson(int selectedRow) {
@@ -50,6 +50,11 @@ public class SavedPersonsCollection extends AbstractListModel implements Seriali
        return persons.get(index);
     }
 
-    
+    public void setPersons(ArrayList<Person> spc) {
+        this.persons = spc;
+        //this.fireContentsChanged(spc, 0, spc.lastIndexOf(spc));
+    }
+
+
 
 }
