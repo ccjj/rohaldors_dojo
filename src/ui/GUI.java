@@ -105,7 +105,9 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
         initComponents();
         loadButton.setMinimumSize(saveButton.getSize());
+
         setActionListeners();
+                loadSavedPersons();
         table.requestFocus();
     }
 
@@ -452,6 +454,18 @@ public class GUI extends javax.swing.JFrame {
         });
     }
 
+    private void loadSavedPersons(){
+                        try {
+                    savedPersonsCollection.persons = (ArrayList<Person>) Load.load("persons.ser");
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException | ClassNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                 updateSavedPersonListModel();
+                       
+    }
+    
     private boolean couldPastePerson(String data) {
         String[] parts = data.split("\\t");
         if (parts.length != personCollection.getColumnCount()) {
@@ -703,27 +717,7 @@ public class GUI extends javax.swing.JFrame {
 
         loadSavedPersonButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    savedPersonsCollection.persons = (ArrayList<Person>) Load.load("persons.ser");
-                } catch (FileNotFoundException e1) {
-                    try {
-                        Save.saveAsFile("persons.ser", null);
-                    } catch (FileNotFoundException e2) {
-                        e2.printStackTrace();
-                    } catch (IOException e2) {
-                        e2.printStackTrace();
-                    }
-                } catch (IOException e1) {
-                    try {
-                        Save.saveAsFile("persons.ser", null);
-                    } catch (FileNotFoundException e2) {
-                        e2.printStackTrace();
-                    } catch (IOException e2) {
-                        e2.printStackTrace();
-                    }
-                } catch (ClassNotFoundException e1) {
-                    e1.printStackTrace();
-                }
+                loadSavedPersons();
                 updateSavedPersonListModel();
             }
         });
