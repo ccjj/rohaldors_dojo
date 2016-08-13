@@ -1,2 +1,0 @@
-erinnerung.ErinnerungCollection
-erinnerung.ErinnerungComparator
