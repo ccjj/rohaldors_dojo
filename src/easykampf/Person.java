@@ -7,6 +7,9 @@ package easykampf;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import ui.GUI;
 
 /**
  *
@@ -15,9 +18,11 @@ import java.io.Serializable;
 public class Person implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 2L;
-    private int AT, PA, INI, BASEINI, RS, LP, MAXLP, WUNDEN, WS, ASP, WUNDENOLD, LPFAKTOROLD, ISTMP, AKTIONEN = 0;
+    private int AT, PA, INI, BASEINI, RS, LP, MAXLP, WUNDEN, WS, ASP, WUNDENOLD, LPFAKTOROLD, ISTMP, AKTIONEN, MR, AU, GS, generation = 0;
     private int ALLY = 1;
     private String NAME = "";
+    private String TP = "";
+    private Person KAMPF_GEGEN = null;
     private Color color = new Color(110, 230, 110); //ALLY DEFAULT
 
     public Person(String NAME, int AT, int PA, int INI, int BASEINI, int RS, int LP, int MAXLP, int WUNDEN, int WS, int ASP, int ALLY, int BONUSAKTIONEN) {
@@ -36,11 +41,31 @@ public class Person implements Serializable, Cloneable {
         this.AKTIONEN = BONUSAKTIONEN;
         setColorFromType();
     }
+    
+    
 
-    public Person() {
-
+    public Person(String NAME, int AT, int PA, int INI, int BASEINI, int RS, int LP, int MAXLP, int WUNDEN, int WS, int ASP, int ALLY, int BONUSAKTIONEN, int MR, int AU, int GS, String TP) {
+        this.NAME = NAME;
+        this.AT = AT;
+        this.PA = PA;
+        this.INI = INI;
+        this.BASEINI = BASEINI;
+        this.RS = RS;
+        this.LP = LP;
+        this.MAXLP = MAXLP;
+        this.WUNDEN = WUNDEN;
+        this.WS = WS;
+        this.ASP = ASP;
+        this.ALLY = ALLY;
+        this.AKTIONEN = BONUSAKTIONEN;
+        this.MR = MR;
+        this.AU = AU;
+        this.GS = GS;
+        this.TP = TP;
     }
 
+    public Person(){}
+    
     /**
      * @return the AT
      */
@@ -191,7 +216,7 @@ public class Person implements Serializable, Cloneable {
      * @return the Name
      */
     public String getNAME() {
-        return NAME;
+        return getGenName();
     }
 
     /**
@@ -315,13 +340,13 @@ public class Person implements Serializable, Cloneable {
 
     public int applyDmg(int damage, boolean ignoreWounds, boolean ignoreRS) {
         if (ignoreRS) {
-             damage = damage - this.getRS();
+            damage = damage - this.getRS();
             if (damage < 0) {
                 damage = 0;
             }
         }
         if (ignoreWounds) {
-                if(getWS() != 0){
+            if (getWS() != 0) {
                 int wounds = damage / getWS(); //Math.floor
                 if (wounds > 0) {
                     setWUNDEN(getWUNDEN() + wounds);
@@ -375,15 +400,17 @@ public class Person implements Serializable, Cloneable {
         try {
             setAKTIONEN(Integer.parseInt(value.toString()));
 
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return false;
         }
         return true;
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Object clone() throws CloneNotSupportedException {
+        Person cloned = (Person) super.clone();
+        cloned.setKAMPF_GEGEN(null);
+        return cloned;
     }
 
     void setTMP() {
@@ -407,7 +434,7 @@ public class Person implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return this.getNAME() + ", MAXLP: " + this.getMAXLP() + ", BASEINI: " + this.getBASEINI() + ", RS: " + this.getRS();
+        return this.getNAME();
     }
 
     /**
@@ -434,4 +461,159 @@ public class Person implements Serializable, Cloneable {
         return true;
     }
 
+    /**
+     * @return the MR
+     */
+    public int getMR() {
+        return MR;
+    }
+
+    /**
+     * @param MR the MR to set
+     */
+    public void setMR(int MR) {
+        this.MR = MR;
+    }
+
+    /**
+     * @return the AU
+     */
+    public int getAU() {
+        return AU;
+    }
+
+    /**
+     * @param AU the AU to set
+     */
+    public void setAU(int AU) {
+        this.AU = AU;
+    }
+
+    /**
+     * @return the GS
+     */
+    public int getGS() {
+        return GS;
+    }
+
+    /**
+     * @param GS the GS to set
+     */
+    public void setGS(int GS) {
+        this.GS = GS;
+    }
+
+    /**
+     * @return the TP
+     */
+    public String getTP() {
+        return TP;
+    }
+
+    /**
+     * @param TP the TP to set
+     * @return 
+     */
+    public boolean setTP(String TP) {
+        if (this.TP.equals(TP)) {
+            return false;
+        }
+        this.TP = TP;
+        return true;
+
+    }
+
+    boolean setMR(Object value) {
+        try {
+            setMR(Integer.parseInt(value.toString()));
+
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    boolean setAU(Object value) {
+        try {
+            setAU(Integer.parseInt(value.toString()));
+
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    boolean setGS(Object value) {
+        try {
+            setGS(Integer.parseInt(value.toString()));
+
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    boolean setTP(Object value) {
+        return this.setTP(value.toString());
+    }
+
+    /**
+     * @return the KAMPF_GEGEN
+     */
+    public Person getKAMPF_GEGEN() {
+        return KAMPF_GEGEN;
+    }
+
+    /**
+     */
+    public boolean setKAMPF_GEGEN(Person p) {
+        if (this.KAMPF_GEGEN == p) {
+            return false;
+        }
+        this.KAMPF_GEGEN = p;
+        return true;
+
+    }
+
+    boolean setKAMPF_GEGEN(Object value) {
+        Person p = null;
+        try {
+            p = (Person) value;
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+
+        return setKAMPF_GEGEN(p);
+    }
+
+    public String getDetails() {
+        return getGenName() + ", MAXLP: " + this.getMAXLP() + ", BASEINI: " + this.getBASEINI() + ", RS: " + this.getRS();
+    }
+
+    /**
+     * @return the generation
+     */
+    public int getGeneration() {
+        return generation;
+    }
+
+    /**
+     * @param generation the generation to set
+     */
+    public void setGeneration(int generation) {
+        this.generation = generation;
+    }
+    
+    private String getGenName(){
+        if(this.getGeneration() == 0){
+            return this.NAME;
+        }
+        return this.NAME + " " + this.getGeneration();
+    }
+
+    
+    public String getPureName(){
+        return this.NAME;
+    }
 }

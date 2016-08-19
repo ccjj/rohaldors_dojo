@@ -2,6 +2,7 @@ package ui;
 
 import easykampf.Person;
 import easykampf.PersonCollection;
+import easykampf.PersonComboListModel;
 import easykampf.SavedPersonCollection;
 import easykampf.TextLogger;
 import easykampf.Version;
@@ -28,8 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -39,6 +42,7 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import logic.IsInteger;
@@ -55,7 +59,7 @@ import logic.IsInteger;
 public class GUI extends javax.swing.JFrame {
 
     private int round = 1;
-    private PersonCollection personCollection = new PersonCollection();
+    private PersonCollection personCollection;
     private SavedPersonCollection savedPersonsCollection = new SavedPersonCollection();
 
     Font font = new Font("Courier", Font.PLAIN, 16);
@@ -95,8 +99,13 @@ public class GUI extends javax.swing.JFrame {
     JButton saveSavedPersonButton;
     JButton loadSavedPersonButton;
 
+    DefaultCellEditor allyCE;
+    DefaultCellEditor foeCE;
 
     javax.swing.JScrollPane jScrollPane3;
+
+    PersonComboListModel foeModel;
+    PersonComboListModel allyModel;
 
     // End of variables declaration
     /**
@@ -107,7 +116,7 @@ public class GUI extends javax.swing.JFrame {
         loadButton.setMinimumSize(saveButton.getSize());
 
         setActionListeners();
-                loadSavedPersons();
+        loadSavedPersons();
         table.requestFocus();
     }
 
@@ -120,6 +129,20 @@ public class GUI extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
+        personCollection = new PersonCollection();
+        foeModel = new PersonComboListModel(personCollection.getFoeList());
+        allyModel = new PersonComboListModel(personCollection.getAllyList());
+
+        JComboBox<String> allyBox = new JComboBox<String>();
+        allyBox.setModel(allyModel);
+        allyCE = new DefaultCellEditor(allyBox);
+
+        JComboBox<String> foeBox = new JComboBox<String>();
+
+        foeBox.setModel(foeModel);
+        foeCE = new DefaultCellEditor(foeBox);
+        personCollection.setComboBoxModels(foeModel, allyModel);
+
         table = new RXTable(personCollection) {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -140,6 +163,26 @@ public class GUI extends javax.swing.JFrame {
                 }
                 return c;
             }
+
+            @Override
+            public TableCellEditor getCellEditor(int row, int column) {
+                int modelColumn = convertColumnIndexToModel(column);
+                int personRow = convertRowIndexToModel(row);
+                //System.out.println("row " + personRow + " col " + modelColumn);
+
+                if (modelColumn == personCollection.getKAMPF_GEGENColumnIndex()) {
+                    Person p = personCollection.getPerson(personRow);
+                    if (p.getALLY() == 0) {
+                        return allyCE;
+                    } else {
+                        return foeCE;
+                    }
+
+                }
+                return super.getCellEditor(row, column);
+
+            }
+
         };
 
         table.setSelectAllForEdit(true);
@@ -175,6 +218,7 @@ public class GUI extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane4 = new javax.swing.JScrollPane();
         savedPersonList = new javax.swing.JList();
+        savedPersonList.setCellRenderer(new PersonListRenderer());
         saveButton = new javax.swing.JButton();
         loadButton = new javax.swing.JButton();
         erinnerungField = new HintTextField();
@@ -255,179 +299,179 @@ public class GUI extends javax.swing.JFrame {
 
         savePersonButton.setText("→");
 
-       textLog.setEditable(false);
+        textLog.setEditable(false);
         jScrollPane3.setViewportView(textLog);
 
-               javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 759, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(erinnerungButton)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(saveButton)
-                            .addComponent(loadButton, javax.swing.GroupLayout.Alignment.TRAILING))))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(roundLabel)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(nextRoundButton)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 759, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(resetRoundButton)))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(ignoreWS)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(ignoreRS))
-                            .addComponent(jSeparator4))
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(savedPersonLabel)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(dmgLabel)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jSeparator2)
-                                    .addComponent(jScrollPane4)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(undoButton)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(redoButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(versionLabel)
-                                        .addGap(32, 32, 32)
-                                        .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGap(60, 60, 60)
-                                                .addComponent(calcDmgButton))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGap(59, 59, 59)
-                                                .addComponent(dmgInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGap(8, 8, 8)
-                                                .addComponent(addSavedPersonButton)
-                                                .addGap(7, 7, 7)
-                                                .addComponent(savePersonButton)))
+                                        .addComponent(erinnerungButton)
                                         .addGap(0, 0, Short.MAX_VALUE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(saveSavedPersonButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(loadSavedPersonButton)))
-                                .addContainerGap())))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(82, 82, 82)
-                        .addComponent(rundenInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jScrollPane3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(saveButton)
+                                                .addComponent(loadButton, javax.swing.GroupLayout.Alignment.TRAILING))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(roundLabel)
+                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                        .addComponent(nextRoundButton)
+                                                                        .addGap(18, 18, 18)
+                                                                        .addComponent(resetRoundButton)))
+                                                        .addGap(0, 0, Short.MAX_VALUE))
+                                                .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(ignoreWS)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(ignoreRS))
+                                                .addComponent(jSeparator4))
+                                        .addContainerGap())
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(18, 18, 18)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(savedPersonLabel)
+                                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(dmgLabel)
+                                                        .addGap(0, 0, Short.MAX_VALUE))
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(jSeparator2)
+                                                                .addComponent(jScrollPane4)
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                                        .addGap(0, 0, Short.MAX_VALUE)
+                                                                        .addComponent(undoButton)
+                                                                        .addGap(18, 18, 18)
+                                                                        .addComponent(redoButton)
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                        .addComponent(versionLabel)
+                                                                        .addGap(32, 32, 32)
+                                                                        .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                                        .addGap(60, 60, 60)
+                                                                                        .addComponent(calcDmgButton))
+                                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                                        .addGap(59, 59, 59)
+                                                                                        .addComponent(dmgInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                                        .addGap(8, 8, 8)
+                                                                                        .addComponent(addSavedPersonButton)
+                                                                                        .addGap(7, 7, 7)
+                                                                                        .addComponent(savePersonButton)))
+                                                                        .addGap(0, 0, Short.MAX_VALUE))
+                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                        .addComponent(saveSavedPersonButton)
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                        .addComponent(loadSavedPersonButton)))
+                                                        .addContainerGap())))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(82, 82, 82)
+                                        .addComponent(rundenInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(dmgInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(ignoreWS)
-                            .addComponent(ignoreRS))
-                        .addGap(6, 6, 6)
-                        .addComponent(calcDmgButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(3, 3, 3)
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(roundLabel)
-                        .addGap(24, 24, 24)
-                        .addComponent(rundenInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(nextRoundButton)
-                            .addComponent(resetRoundButton))
-                        .addGap(18, 18, 18)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(savedPersonLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(savePersonButton)
-                            .addComponent(addSavedPersonButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(saveSavedPersonButton)
-                            .addComponent(loadSavedPersonButton))
-                        .addContainerGap(39, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2)
-                            .addComponent(dmgLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(11, 11, 11)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(saveButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(loadButton)
-                                .addGap(52, 52, 52))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jScrollPane3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(41, 41, 41)
+                                        .addComponent(dmgInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                            .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(redoButton)
-                                            .addComponent(undoButton)
-                                            .addComponent(erinnerungButton)
-                                            .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(helpButton))
-                                        .addGap(11, 11, 11))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                        .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addContainerGap())))))))
+                                                .addComponent(ignoreWS)
+                                                .addComponent(ignoreRS))
+                                        .addGap(6, 6, 6)
+                                        .addComponent(calcDmgButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(3, 3, 3)
+                                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(roundLabel)
+                                        .addGap(24, 24, 24)
+                                        .addComponent(rundenInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(nextRoundButton)
+                                                .addComponent(resetRoundButton))
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(savedPersonLabel)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(savePersonButton)
+                                                .addComponent(addSavedPersonButton))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(saveSavedPersonButton)
+                                                .addComponent(loadSavedPersonButton))
+                                        .addContainerGap(39, Short.MAX_VALUE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jScrollPane2)
+                                                .addComponent(dmgLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(11, 11, 11)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(saveButton)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(loadButton)
+                                                        .addGap(52, 52, 52))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(jScrollPane3)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                                .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                .addComponent(redoButton)
+                                                                                .addComponent(undoButton)
+                                                                                .addComponent(erinnerungButton)
+                                                                                .addComponent(erinnerungInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                .addComponent(helpButton))
+                                                                        .addGap(11, 11, 11))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                                        .addComponent(erinnerungField, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addContainerGap())))))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -454,34 +498,38 @@ public class GUI extends javax.swing.JFrame {
         });
     }
 
-    private void loadSavedPersons(){
-                        try {
-                    savedPersonsCollection.persons = (ArrayList<Person>) Load.load("persons.ser");
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (IOException | ClassNotFoundException e1) {
-                    e1.printStackTrace();
-                }
-                 updateSavedPersonListModel();
-                       
+    private void loadSavedPersons() {
+        try {
+            savedPersonsCollection.persons = (ArrayList<Person>) Load.load("persons.ser");
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        } catch (IOException | ClassNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        updateSavedPersonListModel();
+
     }
-    
+
     private boolean couldPastePerson(String data) {
         String[] parts = data.split("\\t");
         if (parts.length != personCollection.getColumnCount()) {
             return false;
         }
-
         String pName = parts[0];
+        String pTp = parts[17];
         ArrayList<Integer> cData = new ArrayList<>();
         for (int i = 1; i < parts.length; i++) {
             //alle zeilen außer dem namen sind vollzahlen. todo getColumnClass
-            if (!IsInteger.isInteger(parts[i])) {
+
+            //13 kampf, 17 tp
+            if (i != 13 && i != 17 && !IsInteger.isInteger(parts[i])) {
                 return false;
+            } else if (i != 13 && i != 17) {
+                cData.add(Integer.parseInt(parts[i]));
             }
-            cData.add(Integer.parseInt(parts[i]));
-        }
-        Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11));
+
+        }//TODO fight against = null
+        Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11), cData.get(12), cData.get(13), cData.get(14), pTp);
         personCollection.addPerson(p);
         updatePersonModel();
         return true;
@@ -665,8 +713,14 @@ public class GUI extends javax.swing.JFrame {
                 }
 
                 for (int i = 0; i < selectedRows.length; i++) {
-                    Person row = savedPersonsCollection.getPerson(selectedRows[0]);
-                    PersonCollection.persons.add(row);
+                    try {
+                        Person row = (Person) savedPersonsCollection.getPerson(selectedRows[0]).clone();
+                        int pGeneration = personCollection.getEnumPersonName(row);
+                        row.setGeneration(pGeneration + 1);
+                        personCollection.addPerson(row);
+                    } catch (CloneNotSupportedException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 
                 }
                 updatePersonModel();
@@ -674,40 +728,28 @@ public class GUI extends javax.swing.JFrame {
         });
 
         loadButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
 
-                    //ArrayList<Person> p = new ArrayList<>();
+                    ArrayList<Person> loaded = (ArrayList<Person>) Load.load("kampf.ser");
                     //personCollection.persons = null;
-                    personCollection.persons = (ArrayList<Person>) Load.load("kampf.ser");
-                } catch (FileNotFoundException e1) {
-                    try {
-                        Save.saveAsFile("kampf.ser", null);
-                    } catch (FileNotFoundException e2) {
-                        e2.printStackTrace();
-                    } catch (IOException e2) {
-                        e2.printStackTrace();
-                    }
-                } catch (IOException e1) {
-                    try {
-                        Save.saveAsFile("kampf.ser", null);
-                    } catch (FileNotFoundException e2) {
-                        e2.printStackTrace();
-                    } catch (IOException e2) {
-                        e2.printStackTrace();
-                    }
-                } catch (ClassNotFoundException e1) {
-                    e1.printStackTrace();
+                    personCollection.setPersons(loaded);
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (ClassNotFoundException | IOException ex) {
+                    ex.printStackTrace();
                 }
                 updatePersonModel();
             }
         });
 
         saveButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    Save.saveAsFile("kampf.ser", personCollection.persons);
+                    Save.saveAsFile("kampf.ser", personCollection.getPersons());
                 } catch (IOException ex) {
                     Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -716,6 +758,7 @@ public class GUI extends javax.swing.JFrame {
         });
 
         loadSavedPersonButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadSavedPersons();
                 updateSavedPersonListModel();
@@ -723,6 +766,7 @@ public class GUI extends javax.swing.JFrame {
         });
 
         saveSavedPersonButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 try {
@@ -735,6 +779,7 @@ public class GUI extends javax.swing.JFrame {
         });
 
         erinnerungButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String s = erinnerungField.getText();
                 if (s == null || s.isEmpty()) {
@@ -757,6 +802,7 @@ public class GUI extends javax.swing.JFrame {
         });
 
         nextRoundButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 round++;
                 rundenInput.setText(Integer.toString(round));
@@ -773,6 +819,7 @@ public class GUI extends javax.swing.JFrame {
         });
 
         resetRoundButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 round = 1;
                 rundenInput.setText(Integer.toString(round));

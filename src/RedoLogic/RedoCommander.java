@@ -15,8 +15,8 @@ public class RedoCommander {
 
     private static RedoCommander instance = null;
     
-    private ArrayList<Command> actions = new ArrayList<>();
-    
+    private static ArrayList<Command> undoActions = new ArrayList<>();
+    private static ArrayList<Command> redoActions = new ArrayList<>();
     
     private RedoCommander() {
     }
@@ -35,7 +35,7 @@ public class RedoCommander {
     
     
     	public void addCommand(Command command) {
-		actions.add(command);
+		undoActions.add(command);
 	}
 	
 	public void executeCommand(Command c) {
@@ -47,11 +47,25 @@ public class RedoCommander {
     
        
         public void undo(Command c){
-            //c.
+           c.undo();
+            
+        }
+        
+        public void undoLast(){
+            Command c = undoActions.get(undoActions.size() - 1);
+            c.undo();
+            undoActions.add(c);
+            redoActions.remove(c);
+            
         }
         
         public void redo(Command c){
             
+        }
+        
+        public void addAndExec(Command c){
+            c.execute();
+            undoActions.add(c);
         }
 
 }
