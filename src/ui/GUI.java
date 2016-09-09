@@ -12,8 +12,10 @@ import io.Load;
 import io.Save;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -29,17 +31,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+
 import javax.swing.RowSorter;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.TableCellEditor;
@@ -63,7 +78,7 @@ public class GUI extends javax.swing.JFrame {
     private SavedPersonCollection savedPersonsCollection = new SavedPersonCollection();
 
     Font font = new Font("Courier", Font.PLAIN, 16);
-    Font boldFont = new Font("Courier", Font.BOLD, 16);
+    Font boldFont = new Font("Courier", Font.BOLD, 12);
     // Variables declaration - do not modify
     private javax.swing.JButton calcDmgButton;
     private javax.swing.JTextField dmgInput;
@@ -94,10 +109,13 @@ public class GUI extends javax.swing.JFrame {
     private JEditorPane textLog;
     private javax.swing.JButton undoButton;
     private javax.swing.JLabel versionLabel;
+    JCheckBoxMenuItem ignoreLPItem;
+    JCheckBoxMenuItem ALLYItem;
     JSeparator jSeparator3;
     JLabel savedPersonLabel;
     JButton saveSavedPersonButton;
     JButton loadSavedPersonButton;
+    JPopupMenu popupMenu;
 
     DefaultCellEditor allyCE;
     DefaultCellEditor foeCE;
@@ -150,11 +168,11 @@ public class GUI extends javax.swing.JFrame {
                 Component c = super.prepareRenderer(renderer, row, column);
 
                 JComponent jc = (JComponent) c;
-                if (!isRowSelected(row)) {
-                    row = convertRowIndexToModel(row);
-                    Color bc = personCollection.getRowColour(row);
-                    c.setBackground(bc);
-                }
+
+                row = convertRowIndexToModel(row);
+                Color bc = personCollection.getRowColour(row, isRowSelected(row));
+                c.setBackground(bc);
+
                 //c.setFont(c.getFont().deriveFont(16.0f), Font.BOLD);
                 if (column == 0) {
                     c.setFont(boldFont);
@@ -187,6 +205,7 @@ public class GUI extends javax.swing.JFrame {
 
         table.setSelectAllForEdit(true);
 
+        //table.setComponentPopupMenu(popupMenu);
         //table.setAutoCreateRowSorter(true);
         TableRowSorter<PersonCollection> sorter = new TableRowSorter<>(personCollection);
 
@@ -203,6 +222,11 @@ public class GUI extends javax.swing.JFrame {
         table.setRowHeight(40);
         //personCollection.addPerson();
         updatePersonModel();
+
+        //hide the ally column
+        table.getColumnModel().getColumn(11).setMinWidth(0);
+        table.getColumnModel().getColumn(11).setMaxWidth(0);
+
         dmgLabel = new javax.swing.JLabel();
         dmgInput = new javax.swing.JTextField(3);
         ignoreWS = new javax.swing.JCheckBox();
@@ -512,11 +536,23 @@ public class GUI extends javax.swing.JFrame {
 
     private boolean couldPastePerson(String data) {
         String[] parts = data.split("\\t");
-        if (parts.length != personCollection.getColumnCount()) {
+        int plen = parts.length;
+        //letzte spalte vorhanden, aber leer
+        if (data.endsWith("\t")) {
+            plen++;
+        }
+
+        if (plen != personCollection.getColumnCount()) {
+            System.out.println("pa " + parts.length + " col " + personCollection.getColumnCount());
             return false;
         }
-        String pName = parts[0];
-        String pTp = parts[17];
+        String pName = pName = parts[0];
+        String pTp = null;
+        //letzte spalte vorhanden, aber leer
+        if (parts.length == personCollection.getColumnCount()) {
+            pTp = parts[17];
+        }
+
         ArrayList<Integer> cData = new ArrayList<>();
         for (int i = 1; i < parts.length; i++) {
             //alle zeilen außer dem namen sind vollzahlen. todo getColumnClass
@@ -624,6 +660,120 @@ public class GUI extends javax.swing.JFrame {
 
         });
 
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+
+                boolean rightMouseButton = SwingUtilities.isRightMouseButton(e);
+
+                if (!rightMouseButton) {
+                    return;
+                }
+
+                int r = table.rowAtPoint(e.getPoint());
+                if (r >= 0 && r < table.getRowCount()) {
+                    table.setRowSelectionInterval(r, r);
+                } else {
+                    table.clearSelection();
+                }
+
+                int rowindex = table.getSelectedRow();
+                if (rowindex < 0) {
+                    return;
+                }
+                if (e.isPopupTrigger() && e.getComponent() instanceof RXTable) {
+
+                    final JPopupMenu pMenu = new JPopupMenu();
+                    final JCheckBoxMenuItem ignorelpItem = new JCheckBoxMenuItem("niedrige LP ignorieren");
+                    final JCheckBoxMenuItem allyItem = new JCheckBoxMenuItem("Ally");
+
+                    pMenu.add(ignorelpItem);
+                    pMenu.add(allyItem);
+
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow < 0) {
+                        return;
+                    }
+
+                    selectedRow = table.convertRowIndexToModel(selectedRow);
+                    Person p = PersonCollection.getPersonAt(selectedRow);
+                    int allyNum = p.getALLY();
+                    if (allyNum == 0) {
+                        System.out.println("NO ALL");
+                        allyItem.setSelected(false);
+                    } else {
+                        allyItem.setSelected(true);
+                    }
+
+                    ignorelpItem.setSelected(p.isIgnoreLowLP());
+
+                    pMenu.show(e.getComponent(), e.getX(), e.getY());
+                    table.setRowSelectionInterval(r, r);
+
+                    allyItem.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int selectedRow = table.getSelectedRow();
+                            if (selectedRow < 0) {
+                                return;
+                            }
+
+                            int cselectedRow = table.convertRowIndexToModel(selectedRow);
+                            Person p = PersonCollection.getPersonAt(cselectedRow);
+
+                            //int allyNum = p.getALLY();
+                            boolean isSelectedAlly = allyItem.isSelected();
+                            if (isSelectedAlly) {
+                                PersonCollection.setPersonAlly(p, 1);
+                                //p.setALLY(1);
+                            } else {
+                                PersonCollection.setPersonAlly(p, 0);
+                                //p.setALLY(0);
+                            }
+                            // PersonCollection.fireRowUpdated(selectedRow);
+                            //table.setRowSelectionInterval(0, 0);
+
+                            //workaround fuer bug, farbe hinter popup nicht geupdated
+                            table.clearSelection();
+                            table.setRowSelectionInterval(selectedRow, selectedRow);
+                            //allyItem.setSelected(true);
+                            //Point p = e.getSource();
+
+                            // get the row index that contains that coordinate
+                            //int rowNumber = table.rowAtPoint( p );
+                            // Get the ListSelectionModel of the JTable
+                            //ListSelectionModel model = table.getSelectionModel();
+                            // set the selected interval of rows. Using the "rowNumber"
+                            // variable for the beginning and end selects only that one row.
+                            //model.setSelectionInterval( rowNumber, rowNumber );
+                        }
+                    });
+
+                    ignorelpItem.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int selectedRow = table.getSelectedRow();
+                            if (selectedRow < 0) {
+                                return;
+                            }
+
+                            int cselectedRow = table.convertRowIndexToModel(selectedRow);
+                            Person p = PersonCollection.getPersonAt(cselectedRow);
+
+                            boolean isSelected = ignorelpItem.isSelected();
+                            p.setIgnoreLowLP(isSelected);
+
+                            table.setRowSelectionInterval(selectedRow, selectedRow);
+
+                        }
+                    });
+
+                }
+
+            }
+        });
+
         table.addKeyListener(new KeyListener() {
 
             @Override
@@ -704,44 +854,38 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        addSavedPersonButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                int[] selectedRows = savedPersonList.getSelectedIndices();
-                if (selectedRows.length < 1) {
-                    return;
-                }
-
-                for (int i = 0; i < selectedRows.length; i++) {
-                    try {
-                        Person row = (Person) savedPersonsCollection.getPerson(selectedRows[0]).clone();
-                        int pGeneration = personCollection.getEnumPersonName(row);
-                        row.setGeneration(pGeneration + 1);
-                        personCollection.addPerson(row);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
-                updatePersonModel();
+        addSavedPersonButton.addActionListener((ActionEvent e) -> {
+            int[] selectedRows = savedPersonList.getSelectedIndices();
+            if (selectedRows.length < 1) {
+                return;
             }
+            
+            for (int i = 0; i < selectedRows.length; i++) {
+                try {
+                    Person row = (Person) savedPersonsCollection.getPerson(selectedRows[0]).clone();
+                    int pGeneration = personCollection.getEnumPersonName(row);
+                    row.setGeneration(pGeneration + 1);
+                    personCollection.addPerson(row);
+                } catch (CloneNotSupportedException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            }
+            updatePersonModel();
         });
 
-        loadButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-
-                    ArrayList<Person> loaded = (ArrayList<Person>) Load.load("kampf.ser");
-                    //personCollection.persons = null;
-                    personCollection.setPersons(loaded);
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (ClassNotFoundException | IOException ex) {
-                    ex.printStackTrace();
-                }
-                updatePersonModel();
+        loadButton.addActionListener((ActionEvent e) -> {
+            try {
+                
+                ArrayList<Person> loaded = (ArrayList<Person>) Load.load("kampf.ser");
+                //personCollection.persons = null;
+                personCollection.setPersons(loaded);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            } catch (ClassNotFoundException | IOException ex) {
+                ex.printStackTrace();
             }
+            updatePersonModel();
         });
 
         saveButton.addActionListener(new ActionListener() {
@@ -840,6 +984,45 @@ public class GUI extends javax.swing.JFrame {
         //textLog.setText(Integer.toString(runden)); //TODO round umbenennen
         ErinnerungCollection.getInstance().add(totalrunden, msg);
         //todo
+    }
+
+    public void showDetails(Person p) {
+
+        final JFrame detailFrame = new JFrame(p.toString());
+        detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        detailFrame.setSize(400, 400);
+        detailFrame.setResizable(false);
+        JTextArea deluxeInfos = new JTextArea(p.toString());
+        deluxeInfos.setSize(400, 170);
+        deluxeInfos.setLineWrap(true);
+        deluxeInfos.setWrapStyleWord(true);
+        deluxeInfos.setEditable(false);
+        final JList notices = new JList();
+        JButton addNotice = new JButton("Notiz hinzufügen");
+        addNotice.setSize(100, 30);
+        JButton removeNotice = new JButton("Notiz entfernen");
+        removeNotice.setSize(100, 30);
+        JButton close = new JButton("Schließen");
+        removeNotice.setSize(30, 30);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setSize(400, 60);
+        buttonPanel.add(addNotice);
+        buttonPanel.add(removeNotice);
+        buttonPanel.add(close);
+        JScrollPane scrollList = new JScrollPane(notices);
+        scrollList.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollList.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollList.setMaximumSize(new Dimension(400, 170));
+        Box contentBox = Box.createVerticalBox();
+        contentBox.setSize(400, 400);
+        contentBox.add(deluxeInfos);
+        JLabel lblnotices = new JLabel("Notizen:");
+        contentBox.add(lblnotices);
+        contentBox.add(scrollList);
+        contentBox.add(buttonPanel);
+        detailFrame.add(contentBox);
+        detailFrame.setVisible(true);
+
     }
 
 }

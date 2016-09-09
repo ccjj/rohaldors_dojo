@@ -5,6 +5,7 @@
  */
 package easykampf;
 
+import functionInterface.BoolFunction;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,11 +29,18 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         "NAME", "AT", "PA", "INI", "BASEINI", "RS", "LP", "MAXLP", "WUNDEN", "WS", "ASP", "ALLY", "BONUSAKTIONEN", "KAMPF_GEGEN", "MR", "AU", "GS", "TP"
     };
 
+    private Color tmpColor = new Color(237, 237, 111);
+    private Color tmpSelectedColor = new Color(222, 216, 60);
+    private Color foeColor = new Color(110, 230, 110);
+    private Color foeSelectedColor = new Color(54, 139, 54);
+    private Color allyColor = new Color(237, 111, 111);
+    private Color allySelectedColor = new Color(191, 41, 41);
+
     private final Map<String, String> columnDict = new HashMap<>(columnNames.length);
 
     //TODO jeder columne einen index zuweisen
-    PersonComboListModel foeModel;
-    PersonComboListModel allyModel;
+    static PersonComboListModel foeModel;
+    static PersonComboListModel allyModel;
 
     private static ArrayList<Person> persons;
 
@@ -87,6 +95,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         columnDict.put("AU", "Integer");
         columnDict.put("GS", "Integer");
         columnDict.put("TP", "String");
+
+        Map<String, BoolFunction> columnFuncs = new HashMap<>(columnNames.length);
+        //columnDict.put("NAME", personHasChanged());
     }
 
     public void setComboBoxModels(PersonComboListModel fModel, PersonComboListModel aModel) {
@@ -202,6 +213,16 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         return columnNames[columnIndex];
     }
 
+    public int getIndex(String columnName) {
+        int i = 0;
+        for (; i < columnNames.length; i++) {
+            if (columnNames[i].equalsIgnoreCase(columnName)) {
+                return i;
+            }
+        }
+        throw new RuntimeException("Spalte " + columnName + " nicht gefunden");
+    }
+
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         boolean hasChanged = false;
@@ -214,14 +235,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         }
         Person row = persons.get(rowIndex);
 
-        if (13 == columnIndex) { //set kampf gegen
-
-            hasChanged = row.setKAMPF_GEGEN(value);
-
-            //TODO remove from all persons durch setter/getter? eigene klasse?
-        }
-
-        if (row.getISTMP() > 0 && columnIndex != 3) {
+        if (row.getISTMP() > 0 && columnIndex != getIndex("INI")) {
             return; //tmp felder können nicht beschrieben werden, und nicht ini die man schreiben will
         }
 
@@ -261,27 +275,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 hasChanged = row.setASP(value);
                 break;
             case 11:
-                hasChanged = row.setALLY(value);
-                if (hasChanged) {
-                    if (row.getALLY() == 1) {
-
-                        getAllyList().add(row);
-                        getFoeList().remove(row);
-                        foeModel.removeComboListPerson(row);
-                        allyModel.addComboListPerson();
-
-                    } else if (row.getALLY() == 0) {
-                        getAllyList().remove(row);
-                        getFoeList().add(row);
-                        allyModel.removeComboListPerson(row);
-                        foeModel.addComboListPerson();
-
-                    } else {
-                        System.out.println("ERR");
-                    }
-                } else {
-                    System.out.println("NO CHANGES");
-                }
+                hasChanged = setPersonAlly(row, value);
                 break;
             case 12:
                 try {
@@ -292,6 +286,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 } finally {
                     return;
                 }
+            case 13:
+                hasChanged = row.setKAMPF_GEGEN(value);
+                break;
             case 14:
                 hasChanged = row.setMR(value);
                 break;
@@ -327,15 +324,60 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     }
 
+    public static boolean setPersonAlly(Person row, Object value) {
+        boolean hasChanged = row.setALLY(value);
+        if (hasChanged) {
+            if (row.getALLY() == 1) {
+
+                getAllyList().add(row);
+                getFoeList().remove(row);
+                foeModel.removeComboListPerson(row);
+                allyModel.addComboListPerson();
+
+            } else if (row.getALLY() == 0) {
+                getAllyList().remove(row);
+                getFoeList().add(row);
+                allyModel.removeComboListPerson(row);
+                foeModel.addComboListPerson();
+
+            }
+        }
+
+        return hasChanged;
+    }
+
     @Override
     public boolean isCellEditable(int row, int columnIndex) {
         //return columnIndex != 13;
         return true;
     }
 
-    public Color getRowColour(int rowIndex) {
+    public Color getRowColour(int rowIndex, boolean isSelected) {
         Person row = persons.get(rowIndex);
-        return row.getColor();
+        return getColor(row, isSelected);
+
+    }
+
+    private Color getColor(Person p, boolean isSelected) {
+        if (p.getISTMP() > 0) {
+            if (isSelected) {
+                return tmpSelectedColor;
+            }
+            return tmpColor;
+        }
+
+        if (p.getALLY() == 0) {
+            if (isSelected) {
+                return allySelectedColor;
+            }
+            return allyColor;
+        } else {
+            if (isSelected) {
+                return foeSelectedColor;
+            }
+            return foeColor;
+        }
+
     }
 
     public void applyPersonDmg(int selectedRow, int dmg, boolean ignoreWS, boolean ignoreRS) {
@@ -358,8 +400,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             allyModel.removeComboListPerson(row);
         }
 
-        persons.remove(row);
         removeDeletedKAMPF_GEGEN(row);
+        persons.remove(row);
+
         fireTableRowsDeleted(selectedRow, selectedRow);
     }
 
@@ -450,25 +493,41 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 TextLogger.getInstance().add(msg);
             }
 
+            //TODO
             for (int i : changedIndices) {
+
                 fireTableCellUpdated(i, 13);
-                //System.out.println(i);
+
             }
 
         }
     }
-    
-    public int getEnumPersonName(Person per){
+
+    public int getEnumPersonName(Person per) {
         String pName = per.getPureName();
-        int maxGen = 0;
-        for (Person p : persons){
-            if(p.getPureName().equals(pName)){
-                if (p.getGeneration() > maxGen)
+        int maxGen = -1;
+        for (Person p : persons) {
+            if (p.getPureName().equals(pName)) {
+                if (p.getGeneration() > maxGen) {
                     maxGen = p.getGeneration();
+                }
             }
-            
+
         }
-        return maxGen++;
+        return maxGen;
     }
 
+    private boolean personHasChanged(BoolFunction f, Person p) {
+        boolean changed = f.func(p);
+        return changed;
+    }
+
+    public static Person getPersonAt(int rowIndex) {
+        return persons.get(rowIndex);
+    }
+
+    public void fireRowUpdated(int row) {
+
+        fireTableRowsUpdated(row, row);
+    }
 }

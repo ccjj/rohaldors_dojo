@@ -4,17 +4,15 @@
  * and open the template in the editor.
  */
 
-package easykampf;
+package functionInterface;
+
+import easykampf.Person;
 
 /**
  * 
  * @author Omar
  */
-public class Version {
-    private static String version = "v 0.6.1";
-    
-    public static String getVersion(){
-        return version;
-    }
 
+public interface BoolFunction {
+    boolean func(Person p);
 }

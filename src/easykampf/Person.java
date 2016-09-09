@@ -23,8 +23,12 @@ public class Person implements Serializable, Cloneable {
     private String NAME = "";
     private String TP = "";
     private Person KAMPF_GEGEN = null;
-    private Color color = new Color(110, 230, 110); //ALLY DEFAULT
+    private boolean ignoreLowLP = false;
+    
+    //TODO objekt für stats
+    private final String fromVersion = Version.getVersion();
 
+    
     public Person(String NAME, int AT, int PA, int INI, int BASEINI, int RS, int LP, int MAXLP, int WUNDEN, int WS, int ASP, int ALLY, int BONUSAKTIONEN) {
         this.NAME = NAME;
         this.AT = AT;
@@ -39,7 +43,6 @@ public class Person implements Serializable, Cloneable {
         this.ASP = ASP;
         this.ALLY = ALLY;
         this.AKTIONEN = BONUSAKTIONEN;
-        setColorFromType();
     }
     
     
@@ -135,19 +138,22 @@ public class Person implements Serializable, Cloneable {
     public void setLP(int LP) {
         int factor = 0;
         this.LP = LP;
-        if (MAXLP / 4 > LP) {
-            factor = -3;
-        } else if (MAXLP / 3 > LP) {
-            factor = -2;
-        } else if (MAXLP / 2 > LP) {
-            factor = -1;
-        } else {
-            factor = 0;
-        }
-
+        if(!isIgnoreLowLP()){
+            if (MAXLP / 4 > LP) {
+                factor = -3;
+            } else if (MAXLP / 3 > LP) {
+                factor = -2;
+            } else if (MAXLP / 2 > LP) {
+                factor = -1;
+            } else {
+                factor = 0;
+            }
+        
+        
         setAT(getAT() + -1 * LPFAKTOROLD + factor);
         setPA(getPA() + -1 * LPFAKTOROLD + factor);
         LPFAKTOROLD = factor;
+        }
     }
 
     /**
@@ -209,7 +215,6 @@ public class Person implements Serializable, Cloneable {
      */
     public void setALLY(int ALLY) {
         this.ALLY = ALLY;
-        setColorFromType();
     }
 
     /**
@@ -311,32 +316,14 @@ public class Person implements Serializable, Cloneable {
         }
         return true;
     }
-
+    
     boolean setNAME(Object value) {
         return setNAME(value.toString());
 
     }
 
-    private void setColorFromType() {
-        if (this.getISTMP() > 0) {
-            this.color = new Color(237, 237, 111); //light yellow
-            return;
-        }
-        if (this.ALLY == 0) {
-            this.color = new Color(237, 111, 111); //light blue
-        } else {
-            this.color = new Color(110, 230, 110); //light red
-        }
-    }
 
-    public Color getColor() {
 
-        return this.color;
-    }
-
-    public void setColor(Color c) {
-        this.color = c;
-    }
 
     public int applyDmg(int damage, boolean ignoreWounds, boolean ignoreRS) {
         if (ignoreRS) {
@@ -415,7 +402,6 @@ public class Person implements Serializable, Cloneable {
 
     void setTMP() {
         this.setISTMP(this.getISTMP() + 1);
-        setColorFromType();
     }
 
     /**
@@ -615,5 +601,19 @@ public class Person implements Serializable, Cloneable {
     
     public String getPureName(){
         return this.NAME;
+    }
+
+    /**
+     * @return the ignoreLowLP
+     */
+    public boolean isIgnoreLowLP() {
+        return ignoreLowLP;
+    }
+
+    /**
+     * @param ignoreLowLP the ignoreLowLP to set
+     */
+    public void setIgnoreLowLP(boolean ignoreLowLP) {
+        this.ignoreLowLP = ignoreLowLP;
     }
 }
