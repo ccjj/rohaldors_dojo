@@ -78,7 +78,7 @@ public class GUI extends javax.swing.JFrame {
     private SavedPersonCollection savedPersonsCollection = new SavedPersonCollection();
 
     Font font = new Font("Courier", Font.PLAIN, 16);
-    Font boldFont = new Font("Courier", Font.BOLD, 12);
+    Font boldFont = new Font("Courier", Font.BOLD, 10);
     // Variables declaration - do not modify
     private javax.swing.JButton calcDmgButton;
     private javax.swing.JTextField dmgInput;
@@ -167,10 +167,8 @@ public class GUI extends javax.swing.JFrame {
 
                 Component c = super.prepareRenderer(renderer, row, column);
 
-                JComponent jc = (JComponent) c;
-
-                row = convertRowIndexToModel(row);
-                Color bc = personCollection.getRowColour(row, isRowSelected(row));
+                int prow = convertRowIndexToModel(row);
+                Color bc = personCollection.getRowColour(prow, isRowSelected(row));
                 c.setBackground(bc);
 
                 //c.setFont(c.getFont().deriveFont(16.0f), Font.BOLD);
@@ -643,7 +641,7 @@ public class GUI extends javax.swing.JFrame {
 
             @Override
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_DELETE || e.getKeyChar() == KeyEvent.VK_MINUS) {
+                if (e.getKeyChar() == KeyEvent.VK_MINUS) {
                     deleteSavedPersons();
                 }
             }
@@ -782,7 +780,7 @@ public class GUI extends javax.swing.JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_DELETE || e.getKeyChar() == KeyEvent.VK_MINUS) {
+                if (e.getKeyChar() == KeyEvent.VK_MINUS) {
                     deletePersons();
                 } else if (e.getKeyChar() == '+') {
                     personCollection.addPerson();
