@@ -24,6 +24,7 @@ public class Person implements Serializable, Cloneable {
     private String TP = "";
     private Person KAMPF_GEGEN = null;
     private boolean ignoreLowLP = false;
+    public final String UUID = java.util.UUID.randomUUID().toString();
     
     //TODO objekt für stats
     private final String fromVersion = Version.getVersion();
@@ -137,6 +138,7 @@ public class Person implements Serializable, Cloneable {
      */
     public void setLP(int LP) {
         int factor = 0;
+        int oldLP = this.LP;
         this.LP = LP;
         if(!isIgnoreLowLP()){
             if (MAXLP / 4 > LP) {
@@ -397,6 +399,7 @@ public class Person implements Serializable, Cloneable {
     public Object clone() throws CloneNotSupportedException {
         Person cloned = (Person) super.clone();
         cloned.setKAMPF_GEGEN(null);
+        cloned.setAKTIONEN(0);
         return cloned;
     }
 
@@ -615,5 +618,12 @@ public class Person implements Serializable, Cloneable {
      */
     public void setIgnoreLowLP(boolean ignoreLowLP) {
         this.ignoreLowLP = ignoreLowLP;
+    }
+
+    /**
+     * @return the WUNDENOLD
+     */
+    public int getWUNDENOLD() {
+        return WUNDENOLD;
     }
 }

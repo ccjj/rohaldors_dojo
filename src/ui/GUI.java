@@ -1,5 +1,7 @@
 package ui;
 
+import RedoLogic.ICommand;
+import RedoLogic.RedoCommander;
 import easykampf.Person;
 import easykampf.PersonCollection;
 import easykampf.PersonComboListModel;
@@ -264,8 +266,8 @@ public class GUI extends javax.swing.JFrame {
         setTitle("Rohaldors Dojo");
 
         //logger = new TextLogger(textLog);
-        undoButton.setVisible(false);
-        redoButton.setVisible(false);
+        undoButton.setVisible(true);
+        redoButton.setVisible(true);
 
         TextLogger.getInstance().setTextField(textLog);
         jScrollPane2.setViewportView(table);
@@ -564,8 +566,20 @@ public class GUI extends javax.swing.JFrame {
 
         }//TODO fight against = null
         Person p = new Person(pName, cData.get(0), cData.get(1), cData.get(2), cData.get(3), cData.get(4), cData.get(5), cData.get(6), cData.get(7), cData.get(8), cData.get(9), cData.get(10), cData.get(11), cData.get(12), cData.get(13), cData.get(14), pTp);
-        personCollection.addPerson(p);
-        updatePersonModel();
+        ICommand redoit = () -> {
+            personCollection.addPerson(p);
+            updatePersonModel();
+            return false;
+        };
+        ICommand undoit = () -> {
+            personCollection.removePerson(p);
+            //updatePersonModel(); todo inconsistent table update design in add/remove person
+            return false;
+        };
+        RedoCommander.getInstance().addCommand(undoit, redoit);
+        redoit.apply();
+
+        //updatePersonModel();
         return true;
 
     }
@@ -722,10 +736,17 @@ public class GUI extends javax.swing.JFrame {
                             //int allyNum = p.getALLY();
                             boolean isSelectedAlly = allyItem.isSelected();
                             if (isSelectedAlly) {
-                                PersonCollection.setPersonAlly(p, 1);
+                                ICommand redoit = () -> personCollection.setPersonAlly(p, 1);
+                                ICommand undoit = () -> personCollection.setPersonAlly(p, 0);
+                                redoit.apply();
+                                RedoCommander.getInstance().addCommand(undoit, redoit);
+                                //personCollection.setPersonAlly(p, 1);
                                 //p.setALLY(1);
                             } else {
-                                PersonCollection.setPersonAlly(p, 0);
+                                ICommand redoit = () -> personCollection.setPersonAlly(p, 0);
+                                ICommand undoit = () -> personCollection.setPersonAlly(p, 1);
+                                redoit.apply();
+                                RedoCommander.getInstance().addCommand(undoit, redoit);
                                 //p.setALLY(0);
                             }
                             // PersonCollection.fireRowUpdated(selectedRow);
@@ -782,8 +803,23 @@ public class GUI extends javax.swing.JFrame {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyChar() == KeyEvent.VK_MINUS) {
                     deletePersons();
-                } else if (e.getKeyChar() == '+') {
-                    personCollection.addPerson();
+                } else if (e.getKeyCode() == 107) {
+                    Person p = new Person();
+
+                    ICommand redoit = () -> {
+                        personCollection.addPerson(p);
+                        updatePersonModel();
+                        return false;
+                    };
+
+                    ICommand undoit = () -> {
+                        personCollection.removePerson(p);
+                        updatePersonModel();
+                        return false;
+                    };
+                    RedoCommander.getInstance().addCommand(undoit, redoit);
+                    redoit.apply();
+
                 } else if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
                     String data = null;
                     try {
@@ -818,23 +854,57 @@ public class GUI extends javax.swing.JFrame {
                     return;
                 }
 
+                ArrayList<Person> pToDelete = new ArrayList<>();
                 for (int i = selectedRows.length - 1; i >= 0; i--) {
+
                     int selectedRow = table.convertRowIndexToModel(selectedRows[i]);
-                    personCollection.removePerson(selectedRow);
+                    Person p = PersonCollection.getPersonAt(selectedRow);
+                    pToDelete.add(p);
 
                 }
 
-                updatePersonModel();
+                ICommand redoit = () -> {
+                    for (Person p : pToDelete) {
+                        personCollection.removePerson(p);
+                    }
+                    updatePersonModel();
+                    return false;
+                };
 
+                ICommand undoit = () -> {
+                    for (Person p : pToDelete) {
+                        personCollection.addPerson(p);
+                    }
+                    updatePersonModel();
+                    return false;
+                };
+                RedoCommander.getInstance().addCommand(undoit, redoit);
+                redoit.apply();
+
+                //updatePersonModel();
             }
 
         });
 
         helpButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 showHelpFrame();
+
+            }
+        });
+
+        undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RedoCommander.getInstance().undoLast();
+            }
+        });
+
+        redoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RedoCommander.getInstance().redoLast();
             }
         });
 
@@ -857,7 +927,7 @@ public class GUI extends javax.swing.JFrame {
             if (selectedRows.length < 1) {
                 return;
             }
-            
+
             for (int i = 0; i < selectedRows.length; i++) {
                 try {
                     Person row = (Person) savedPersonsCollection.getPerson(selectedRows[0]).clone();
@@ -874,7 +944,7 @@ public class GUI extends javax.swing.JFrame {
 
         loadButton.addActionListener((ActionEvent e) -> {
             try {
-                
+
                 ArrayList<Person> loaded = (ArrayList<Person>) Load.load("kampf.ser");
                 //personCollection.persons = null;
                 personCollection.setPersons(loaded);

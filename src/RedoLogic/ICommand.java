@@ -4,17 +4,15 @@
  * and open the template in the editor.
  */
 
-package easykampf;
+package RedoLogic;
 
 /**
  * 
  * @author Omar
  */
-public class Version {
-    private static String version = "v 0.7.0";
-    
-    public static String getVersion(){
-        return version;
-    }
 
+
+@FunctionalInterface
+public interface ICommand {
+	public boolean apply();
 }

@@ -5,6 +5,7 @@
  */
 package easykampf;
 
+import RedoLogic.RedoCommander;
 import functionInterface.BoolFunction;
 import java.awt.Color;
 import java.io.Serializable;
@@ -16,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import ui.GUI;
+import RedoLogic.ICommand;
+import RedoLogic.PersonCommand;
 
 /**
  *
@@ -28,6 +31,8 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     private final String[] columnNames = new String[]{
         "NAME", "AT", "PA", "INI", "BASEINI", "RS", "LP", "MAXLP", "WUNDEN", "WS", "ASP", "ALLY", "BONUSAKTIONEN", "KAMPF_GEGEN", "MR", "AU", "GS", "TP"
     };
+
+    private RedoCommander redoCommander;
 
     private Color tmpColor = new Color(237, 237, 111);
     private Color tmpSelectedColor = new Color(222, 216, 60);
@@ -75,6 +80,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     //todo old aktionen val, array of clones?
 
     public PersonCollection() {
+        this.redoCommander = RedoCommander.getInstance();
         persons = new ArrayList<Person>();
         getFoeList().add(null);
         getAllyList().add(null);
@@ -114,7 +120,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     public void addPerson() {
         Person p = new Person();
         addPerson(p);
-    }
+     }
 
     public void addPerson(Person p) {
         this.persons.add(p);
@@ -225,8 +231,10 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        ICommand redoit = null;
+        ICommand undoit = null;
         boolean hasChanged = false;
-
+        Object oldValue = this.getValueAt(rowIndex, columnIndex);
         String oldVal = "nichts";
         try {
             oldVal = this.getValueAt(rowIndex, columnIndex).toString();
@@ -241,71 +249,267 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
         switch (columnIndex) {
             case 0:
-                hasChanged = row.setNAME(value);
-                row.setGeneration(0);
+                int oldGen = row.getGeneration();
+                redoit = () -> {
+                    row.setGeneration(0);
+                    boolean b = row.setNAME(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+
+                undoit = () -> {
+                    boolean b = row.setNAME(oldValue);
+                    row.setGeneration(oldGen);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
+                //TODO auch redo?
+
                 break;
             case 1:
-                hasChanged = row.setAT(value);
+                redoit = () -> {
+                    boolean b = row.setAT(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setAT(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 2:
-                hasChanged = row.setPA(value);
+                redoit = () -> {
+                    boolean b = row.setPA(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setPA(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 3:
-                hasChanged = row.setINI(value);
+                redoit = () -> {
+                    boolean b = row.setINI(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setINI(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 4:
-                hasChanged = row.setBASEINI(value);
+                redoit = () -> {
+                    boolean b = row.setBASEINI(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setBASEINI(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 5:
-                hasChanged = row.setRS(value);
+                redoit = () -> {
+                    boolean b = row.setRS(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setRS(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 6:
-                hasChanged = row.setLP(value);
+                redoit = () -> {
+                    boolean b = row.setLP(value);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setLP(oldValue);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 7:
-                hasChanged = row.setMAXLP(value);
+                redoit = () -> {
+                    boolean b = row.setMAXLP(value);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setMAXLP(oldValue);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 8:
-                hasChanged = row.setWUNDEN(value);
+                redoit = () -> {
+                    boolean b = row.setWUNDEN(value);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setWUNDEN(oldValue);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 9:
-                hasChanged = row.setWS(value);
+                redoit = () -> {
+                    boolean b = row.setWS(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setWS(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 10:
-                hasChanged = row.setASP(value);
+                redoit = () -> {
+                    boolean b = row.setASP(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setASP(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 11:
-                hasChanged = setPersonAlly(row, value);
+                redoit = () -> {
+                    boolean b = setPersonAlly(row, value);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = setPersonAlly(row, oldValue);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 12:
+                final int aktionen;
                 try {
-                    int aktionen = Integer.parseInt(value.toString());
-                    row.setAKTIONEN(aktionen);
-                    addClones(row, aktionen);
+
+                    aktionen = Integer.parseInt(value.toString());
+                    if (aktionen <= 0) {
+                        return;
+                    }
+
+                    //TODO logger text ändern
+                    redoit = () -> {
+                        row.setAKTIONEN(aktionen);
+                        addClones(row, aktionen);
+                        fireTableDataChanged();
+                        return false;
+                    };
+                    undoit = () -> {
+                        row.setAKTIONEN(0);
+                        removeClones(row, aktionen);
+                        fireTableDataChanged();
+                        return false;
+                    };
+                    RedoCommander.getInstance().addCommand(undoit, redoit);
+                    redoit.apply();
+
                 } catch (Exception e) {
                 } finally {
                     return;
                 }
             case 13:
-                hasChanged = row.setKAMPF_GEGEN(value);
+                redoit = () -> {
+                    boolean b = row.setKAMPF_GEGEN(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setKAMPF_GEGEN(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 14:
-                hasChanged = row.setMR(value);
+                redoit = () -> {
+                    boolean b = row.setMR(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setMR(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 15:
-                hasChanged = row.setAU(value);
+               redoit = () -> {
+                    boolean b = row.setAU(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setAU(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 16:
-                hasChanged = row.setGS(value);
+               redoit = () -> {
+                    boolean b = row.setGS(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setGS(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             case 17:
-                hasChanged = row.setTP(value);
+               redoit = () -> {
+                    boolean b = row.setTP(value);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setTP(oldValue);
+                    fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
                 break;
             default:
-                break;
+                break; //TODO return?
         }
 
         if (hasChanged) {
+            RedoCommander.getInstance().addCommand(undoit, redoit);
             String newval;
             try {
                 newval = value.toString();
@@ -320,12 +524,12 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             String msg = row.getNAME() + " " + columnNames[columnIndex] + ": von " + oldVal + " auf " + newval + " geändert";
             TextLogger.getInstance().add(msg);
         }
-        fireTableCellUpdated(rowIndex, columnIndex);
 
     }
 
-    public static boolean setPersonAlly(Person row, Object value) {
+    public boolean setPersonAlly(Person row, Object value) {
         boolean hasChanged = row.setALLY(value);
+
         if (hasChanged) {
             if (row.getALLY() == 1) {
 
@@ -381,17 +585,41 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     }
 
     public void applyPersonDmg(int selectedRow, int dmg, boolean ignoreWS, boolean ignoreRS) {
+        ICommand redoit;
+        ICommand undoit;
+        //redoit = () -> row.setALLY(value);
+        //undoit = () -> row.setALLY(oldvalue);
+        Person row = persons.get(selectedRow);
+        int[] oldWounds = new int[1];
+        int[] oldLP = new int[1];
+        redoit = () -> {
+            oldWounds[1] = row.getWUNDEN();
+            oldLP[1] = row.getLP();
+            doPersonDmg(selectedRow, dmg, ignoreWS, ignoreRS);
+
+            return false;
+        };
+        undoit = () -> {
+            row.setWUNDEN(oldWounds[1]);
+            row.setLP(oldLP[1]);
+            return false;
+        };
+        RedoCommander.getInstance().addCommand(undoit, redoit);
+        redoit.apply();
+
+    }
+
+    public void doPersonDmg(int selectedRow, int dmg, boolean ignoreWS, boolean ignoreRS) {
         Person row = persons.get(selectedRow);
         int oldLp = row.getLP();
         int lpNow = row.applyDmg(dmg, ignoreWS, ignoreRS);
-        String msg = row.getNAME() + " erleidet " + dmg + "Schaden. LP" + ": von " + oldLp + " auf " + lpNow + " geändert";
+        String msg = row.getNAME() + " erleidet " + dmg + "Schaden. LP" + ": von " + oldLp + " auf " + lpNow + " gesunken.";
         TextLogger.getInstance().add(msg);
         fireTableRowsUpdated(selectedRow, selectedRow);
     }
-
-    public void removePerson(int selectedRow) {
-        Person row = persons.get(selectedRow);
-        if (row.getALLY() == 0) {
+    
+    public void removePerson(Person row){
+                if (row.getALLY() == 0) {
             getFoeList().remove(row);
             foeModel.removeComboListPerson(row);
 
@@ -403,7 +631,14 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         removeDeletedKAMPF_GEGEN(row);
         persons.remove(row);
 
-        fireTableRowsDeleted(selectedRow, selectedRow);
+        //fireTableRowsDeleted(selectedRow, selectedRow); todo
+        fireTableDataChanged();
+    }
+
+    public void removePerson(int selectedRow) {
+        Person row = persons.get(selectedRow);
+        removePerson(row);
+
     }
 
     private void addClones(Person row, int aktionen) {
@@ -421,7 +656,32 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         } catch (CloneNotSupportedException ex) {
             //Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        fireTableDataChanged();
+        
+    }
+
+    
+    // TODO danach genrell personen löschen/hinzufügen
+    private void removeClones(Person row, int aktionen) {
+        //String pname = row.getPureName();
+        /*
+        for(int i = persons.size() -1; i >= 0; i--){
+            Person p = persons.get(i);
+            if(p.getISTMP() > 0 && p.UUID == row.UUID){
+                persons.remove(p);
+            }
+            
+        }
+        */
+        Iterator<Person> it = persons.iterator();
+        while (it.hasNext()) {
+            Person p = it.next();
+            if (p.getISTMP() > 0 && p.UUID == row.UUID && aktionen > 0) {
+                it.remove();
+                aktionen--;
+            }
+        }
+        
+
     }
 
     public void removeTmpPersons() {

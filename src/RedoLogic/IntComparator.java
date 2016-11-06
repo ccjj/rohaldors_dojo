@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package easykampf;
+package RedoLogic;
 
 import java.util.Comparator;
 

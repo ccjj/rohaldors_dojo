@@ -10,13 +10,14 @@ package RedoLogic;
  * 
  * @author Omar
  */
+public class CommandTuple {
 
-
-
-public interface Command {
-	public void execute();
-        
-        public void undo();
-        
-        public void redo();
+    final ICommand undo;
+    final ICommand redo;
+    
+    public CommandTuple(ICommand undo, ICommand redo){
+        this.undo = undo;
+        this.redo = redo;
+    }
+    
 }
