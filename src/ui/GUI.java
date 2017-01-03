@@ -622,6 +622,14 @@ public class GUI extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 table.requestFocus();
+                
+                
+                int row = table.rowAtPoint(e.getPoint());
+   System.out.println("outside table, would be row " + row );
+
+        //return this.table.rowAtPoint(p);            
+    
+                
             }
         });
 

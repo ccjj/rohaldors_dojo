@@ -6,6 +6,7 @@
 package RedoLogic;
 
 import java.util.ArrayList;
+import java.util.Observer;
 
 /**
  *
@@ -19,6 +20,7 @@ public class RedoCommander {
     private static ArrayList<ICommand> redoActions;
     private static ArrayList<CommandTuple> actions;
     private static int pointer;
+    private static ArrayList<Observer> asd;
     
     private RedoCommander() {
     }
@@ -48,6 +50,7 @@ public class RedoCommander {
         pointer++;
         //System.out.println("p " + pointer);
         //System.out.println("a " + actionSize);
+        asd.notifyAll();
     }
     
     
@@ -59,18 +62,17 @@ public class RedoCommander {
         for (; remItemsCounter > 0; remItemsCounter--){
             actions.remove(actionsSize-i);
             i++;
-            
         }
         
-        
         actions.add(cmd);
-        //alles über pointer, del
         pointer++;
     }
     
     public int getActionsSize(){
         return RedoCommander.actions.size();
     }
+    
+    
     
 
 }

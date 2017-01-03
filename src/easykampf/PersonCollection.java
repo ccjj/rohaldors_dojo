@@ -593,15 +593,15 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         int[] oldWounds = new int[1];
         int[] oldLP = new int[1];
         redoit = () -> {
-            oldWounds[1] = row.getWUNDEN();
-            oldLP[1] = row.getLP();
+            oldWounds[0] = row.getWUNDEN();
+            oldLP[0] = row.getLP();
             doPersonDmg(selectedRow, dmg, ignoreWS, ignoreRS);
 
             return false;
         };
         undoit = () -> {
-            row.setWUNDEN(oldWounds[1]);
-            row.setLP(oldLP[1]);
+            row.setWUNDEN(oldWounds[0]);
+            row.setLP(oldLP[0]);
             return false;
         };
         RedoCommander.getInstance().addCommand(undoit, redoit);
