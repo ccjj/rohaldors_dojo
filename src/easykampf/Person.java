@@ -23,7 +23,9 @@ public class Person implements Serializable, Cloneable {
     private String NAME = "";
     private String TP = "";
     private Person KAMPF_GEGEN = null;
-    private boolean ignoreLowLP = false;
+    private Boolean ignoreLowLP = false;
+    private Boolean pariert = false;
+    private Boolean angegriffen = false;
     public final String UUID = java.util.UUID.randomUUID().toString();
     
     //TODO objekt für stats
@@ -625,5 +627,45 @@ public class Person implements Serializable, Cloneable {
      */
     public int getWUNDENOLD() {
         return WUNDENOLD;
+    }
+
+    /**
+     * @return the pariert
+     */
+    public Boolean getPariert() {
+        return pariert;
+    }
+
+    /**
+     * @param pariert the pariert to set
+     */
+    public void setPariert(Boolean pariert) {
+        this.pariert = pariert;
+    }
+
+    /**
+     * @return the angegriffen
+     */
+    public Boolean getAngegriffen() {
+        return angegriffen;
+    }
+
+    /**
+     * @param angegriffen the angegriffen to set
+     */
+    public void setAngegriffen(Boolean angegriffen) {
+        this.angegriffen = angegriffen;
+    }
+
+    Boolean setAngegriffen(Object value) {
+        Boolean b = (Boolean) value;
+        setAngegriffen(b);
+        return true;
+    }
+
+    Boolean setPariert(Object value) {
+                Boolean b =  (Boolean) value;
+        setPariert(b);
+        return true;
     }
 }

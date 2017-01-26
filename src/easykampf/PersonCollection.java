@@ -19,6 +19,8 @@ import javax.swing.table.AbstractTableModel;
 import ui.GUI;
 import RedoLogic.ICommand;
 import RedoLogic.PersonCommand;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -28,9 +30,44 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     private static ArrayList<Person> allyList = new ArrayList<>();
     private static ArrayList<Person> foeList = new ArrayList<>();
-    private final String[] columnNames = new String[]{
-        "NAME", "AT", "PA", "INI", "BASEINI", "RS", "LP", "MAXLP", "WUNDEN", "WS", "ASP", "ALLY", "BONUSAKTIONEN", "KAMPF_GEGEN", "MR", "AU", "GS", "TP"
-    };
+
+    public void resetPerson(Person p) {
+  
+        
+
+                  ICommand  redoit = () -> {
+                                  p.setLP(p.getMAXLP());
+                            p.setWUNDEN(0);
+                            p.setINI(p.getBASEINI());
+                            updatePerson(p);
+                        return false;
+                    };
+                  ICommand  undoit = () -> {
+                            int currentLP = p.getLP();
+        int currentWunden = p.getWUNDEN();
+        int currentINI = p.getINI();
+                                   p.setLP(currentLP);
+                            p.setWUNDEN(currentWunden);
+                            p.setINI(currentINI);
+                            updatePerson(p);
+                        return false;
+                    };
+                    RedoCommander.getInstance().addCommand(undoit, redoit);
+                    redoit.apply();
+        
+        
+ 
+    }
+
+    private  void updatePerson(Person p) {
+        int index = persons.indexOf(p);
+        assert index != -1;
+        fireRowUpdated(index);
+    }
+    private String[] columnNames;// = new String[]{
+    //     "NAME", "AT", "PA", "INI", "BASEINI", "RS", "LP", "MAXLP", "WUNDEN", "WS", "ASP", "ALLY", "BONUSAKTIONEN", "KAMPF_GEGEN", "MR", "AU", "GS", "TP"
+    // };
+    private Class[] columnClasses;
 
     private RedoCommander redoCommander;
 
@@ -41,8 +78,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     private Color allyColor = new Color(237, 111, 111);
     private Color allySelectedColor = new Color(191, 41, 41);
 
-    private final Map<String, String> columnDict = new HashMap<>(columnNames.length);
-
+    //private final Map<String, String> columnDict = new HashMap<>(columnNames.length);
     //TODO jeder columne einen index zuweisen
     static PersonComboListModel foeModel;
     static PersonComboListModel allyModel;
@@ -81,28 +117,35 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     public PersonCollection() {
         this.redoCommander = RedoCommander.getInstance();
+        LinkedHashMap<String, Class<?>> tmpSet = new LinkedHashMap<>();
         persons = new ArrayList<Person>();
         getFoeList().add(null);
         getAllyList().add(null);
 
-        columnDict.put("NAME", "String");
-        columnDict.put("AT", "Integer");
-        columnDict.put("PA", "Integer");
-        columnDict.put("AT", "Integer");
-        columnDict.put("INI", "Integer");
-        columnDict.put("BASEINI", "Integer");
-        columnDict.put("LP", "Integer");
-        columnDict.put("MAXLP", "Integer");
-        columnDict.put("WUNDEN", "Integer");
-        columnDict.put("WS", "Integer");
-        columnDict.put("BONUSAKTIONEN", "Integer");
-        columnDict.put("KAMPF_GEGEN", "Person");
-        columnDict.put("MR", "Integer");
-        columnDict.put("AU", "Integer");
-        columnDict.put("GS", "Integer");
-        columnDict.put("TP", "String");
+        tmpSet.put("NAME", String.class);
+        tmpSet.put("AT", Integer.class);
+        tmpSet.put("PA", Integer.class);
+        tmpSet.put("INI", Integer.class);
+        tmpSet.put("BASEINI", Integer.class);
+        tmpSet.put("RS", Integer.class);
+        tmpSet.put("LP", Integer.class);
+        tmpSet.put("MAXLP", Integer.class);
+        tmpSet.put("WUNDEN", Integer.class);
+        tmpSet.put("WS", Integer.class);
+        tmpSet.put("ASP", Integer.class);
+        tmpSet.put("ALLY", Integer.class);
+        tmpSet.put("BONUSAKTIONEN", Integer.class);
+        tmpSet.put("KAMPF_GEGEN", Person.class);
+        tmpSet.put("MR", Integer.class);
+        tmpSet.put("AU", Integer.class);
+        tmpSet.put("GS", Integer.class);
+        tmpSet.put("TP", String.class);
+        tmpSet.put("ANGEGRIFFEN", Boolean.class);
+        tmpSet.put("PARIERT", Boolean.class);
 
-        Map<String, BoolFunction> columnFuncs = new HashMap<>(columnNames.length);
+        columnNames = tmpSet.keySet().toArray(new String[tmpSet.size()]);
+        columnClasses = tmpSet.values().toArray(new Class[tmpSet.size()]);
+        //Map<String, BoolFunction> columnFuncs = new HashMap<>(columnNames.length);
         //columnDict.put("NAME", personHasChanged());
     }
 
@@ -112,15 +155,15 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     }
 
     public int getKAMPF_GEGENColumnIndex() {
-        //return columnNames.indexOf("KAMPF_GEGEN");
+        return Arrays.asList(columnNames).indexOf("KAMPF_GEGEN");
         //return  java.util.Arrays.asList(columnNames).indexOf("KAMPF_GEGEN");
-        return 13;
+
     }
 
     public void addPerson() {
         Person p = new Person();
         addPerson(p);
-     }
+    }
 
     public void addPerson(Person p) {
         this.persons.add(p);
@@ -208,6 +251,10 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 return row.getGS();
             case 17:
                 return row.getTP();
+            case 18:
+                return row.getAngegriffen();
+            case 19:
+                return row.getPariert();
             default:
                 break;
         }
@@ -239,11 +286,11 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         try {
             oldVal = this.getValueAt(rowIndex, columnIndex).toString();
         } catch (Exception e) {
-            System.out.println("NULL");
+            //System.out.println("NULL");
         }
         Person row = persons.get(rowIndex);
 
-        if (row.getISTMP() > 0 && columnIndex != getIndex("INI")) {
+        if (row.getISTMP() > 0 && columnIndex != getIndex("INI") && columnIndex != getIndex("ANGEGRIFFEN") && columnIndex != getIndex("PARIERT")) {
             return; //tmp felder können nicht beschrieben werden, und nicht ini die man schreiben will
         }
 
@@ -466,7 +513,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 hasChanged = redoit.apply();
                 break;
             case 15:
-               redoit = () -> {
+                redoit = () -> {
                     boolean b = row.setAU(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
                     return b;
@@ -479,7 +526,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 hasChanged = redoit.apply();
                 break;
             case 16:
-               redoit = () -> {
+                redoit = () -> {
                     boolean b = row.setGS(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
                     return b;
@@ -492,7 +539,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 hasChanged = redoit.apply();
                 break;
             case 17:
-               redoit = () -> {
+                redoit = () -> {
                     boolean b = row.setTP(value);
                     fireTableRowsUpdated(rowIndex, rowIndex);
                     return b;
@@ -500,6 +547,32 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 undoit = () -> {
                     boolean b = row.setTP(oldValue);
                     fireTableRowsUpdated(rowIndex, rowIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
+                break;
+            case 18:
+                redoit = () -> {
+                    boolean b = row.setAngegriffen(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setAngegriffen(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
+                break;
+            case 19:
+                redoit = () -> {
+                    boolean b = row.setPariert(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setPariert(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
                     return b;
                 };
                 hasChanged = redoit.apply();
@@ -520,7 +593,15 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             if (oldVal.equals("") || oldVal == null) {
                 oldVal = "nichts";
             }
-
+            if(oldVal.equals("true"))
+                    oldVal = "ja";
+            if(newval.equals("true"))
+                    newval = "ja";
+            if(oldVal.equals("false"))
+                oldVal = "nein";
+            if(newval.equals("false"))
+                newval = "nein";
+            
             String msg = row.getNAME() + " " + columnNames[columnIndex] + ": von " + oldVal + " auf " + newval + " geändert";
             TextLogger.getInstance().add(msg);
         }
@@ -617,9 +698,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         TextLogger.getInstance().add(msg);
         fireTableRowsUpdated(selectedRow, selectedRow);
     }
-    
-    public void removePerson(Person row){
-                if (row.getALLY() == 0) {
+
+    public void removePerson(Person row) {
+        if (row.getALLY() == 0) {
             getFoeList().remove(row);
             foeModel.removeComboListPerson(row);
 
@@ -656,10 +737,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         } catch (CloneNotSupportedException ex) {
             //Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
-    
     // TODO danach genrell personen löschen/hinzufügen
     private void removeClones(Person row, int aktionen) {
         //String pname = row.getPureName();
@@ -669,9 +749,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             if(p.getISTMP() > 0 && p.UUID == row.UUID){
                 persons.remove(p);
             }
-            
+
         }
-        */
+         */
         Iterator<Person> it = persons.iterator();
         while (it.hasNext()) {
             Person p = it.next();
@@ -680,7 +760,6 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 aktionen--;
             }
         }
-        
 
     }
 
@@ -698,16 +777,9 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     @Override
     public Class<?> getColumnClass(int colNum) {
-        switch (colNum) {
-            case 0:
-                return String.class;
-            case 13:
-                return Person.class;
-            case 17:
-                return String.class;
-            default:
-                return Integer.class;
-        }
+        //System.out.println(columnNames[colNum] + " " + columnClasses[colNum].getTypeName() + " c " + colNum);
+        return columnClasses[colNum];
+
     }
 
     public Person getPerson(int selectedRow) {
@@ -789,5 +861,16 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     public void fireRowUpdated(int row) {
 
         fireTableRowsUpdated(row, row);
+    }
+
+    public void resetAngPar() {
+        for (Person p : persons) {
+            if (p.getAngegriffen() == true) {
+                p.setAngegriffen(false);
+            }
+            if (p.getPariert() == true) {
+                p.setPariert(false);
+            }
+        }
     }
 }

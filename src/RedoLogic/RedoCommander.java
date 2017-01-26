@@ -20,7 +20,7 @@ public class RedoCommander {
     private static ArrayList<ICommand> redoActions;
     private static ArrayList<CommandTuple> actions;
     private static int pointer;
-    private static ArrayList<Observer> asd;
+   // private static ArrayList<Observer> asd;
     
     private RedoCommander() {
     }
@@ -50,7 +50,7 @@ public class RedoCommander {
         pointer++;
         //System.out.println("p " + pointer);
         //System.out.println("a " + actionSize);
-        asd.notifyAll();
+        //asd.notifyAll();
     }
     
     

@@ -45,3 +45,5 @@ manifest.mf
 dist/README.TXT
 *.ser
 build/
+src/ui/MainFrame.java
+src/ui/MainFrame.form

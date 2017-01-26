@@ -6,14 +6,19 @@
 
 package easykampf;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * 
  * @author Omar
  */
 public class Version {
-    private static String version = "v 0.7.0";
+    private static String version;
     
     public static String getVersion(){
+        version = "v 1." + new SimpleDateFormat("MMddyyHHmm").format(Calendar.getInstance().getTime());
         return version;
     }
 

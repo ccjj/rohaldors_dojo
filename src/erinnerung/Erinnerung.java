@@ -10,11 +10,12 @@ package erinnerung;
  * @author cje
  */
 public class Erinnerung {
-    private int runde;
+    private int runde, rundenLeft;
     private String msg;
     
-    public Erinnerung(int runden, String msg){
+    public Erinnerung(int runden, int rundenLeft, String msg){
         this.runde = runden;
+        this.rundenLeft = rundenLeft;
         this.msg = msg;
     }
 
@@ -44,6 +45,16 @@ public class Erinnerung {
      */
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+    
+ 
+    @Override
+    public String toString(){
+        return rundenLeft + " | " + msg;
+    }
+
+    void reduceLeftRounds() {
+        rundenLeft--;
     }
     
     
