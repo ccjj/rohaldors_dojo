@@ -730,6 +730,7 @@ public class GUI extends javax.swing.JFrame {
                 int selectedRow = table.convertRowIndexToModel(selectedRows);
 
                 personCollection.applyPersonDmg(selectedRow, dmg, !ignoreWS.isSelected(), !ignoreRS.isSelected());
+                personCollection.fireRowUpdated(selectedRow);
                 System.out.println(ignoreWS.isSelected());
             }
         });
