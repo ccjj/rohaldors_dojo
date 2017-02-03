@@ -32,34 +32,30 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     private static ArrayList<Person> foeList = new ArrayList<>();
 
     public void resetPerson(Person p) {
-  
-        
 
-                  ICommand  redoit = () -> {
-                                  p.setLP(p.getMAXLP());
-                            p.setWUNDEN(0);
-                            p.setINI(p.getBASEINI());
-                            updatePerson(p);
-                        return false;
-                    };
-                  ICommand  undoit = () -> {
-                            int currentLP = p.getLP();
-        int currentWunden = p.getWUNDEN();
-        int currentINI = p.getINI();
-                                   p.setLP(currentLP);
-                            p.setWUNDEN(currentWunden);
-                            p.setINI(currentINI);
-                            updatePerson(p);
-                        return false;
-                    };
-                    RedoCommander.getInstance().addCommand(undoit, redoit);
-                    redoit.apply();
-        
-        
- 
+        ICommand redoit = () -> {
+            p.setLP(p.getMAXLP());
+            p.setWUNDEN(0);
+            p.setINI(p.getBASEINI());
+            updatePerson(p);
+            return false;
+        };
+        ICommand undoit = () -> {
+            int currentLP = p.getLP();
+            int currentWunden = p.getWUNDEN();
+            int currentINI = p.getINI();
+            p.setLP(currentLP);
+            p.setWUNDEN(currentWunden);
+            p.setINI(currentINI);
+            updatePerson(p);
+            return false;
+        };
+        RedoCommander.getInstance().addCommand(undoit, redoit);
+        redoit.apply();
+
     }
 
-    private  void updatePerson(Person p) {
+    private void updatePerson(Person p) {
         int index = persons.indexOf(p);
         assert index != -1;
         fireRowUpdated(index);
@@ -142,6 +138,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         tmpSet.put("TP", String.class);
         tmpSet.put("ANGEGRIFFEN", Boolean.class);
         tmpSet.put("PARIERT", Boolean.class);
+        tmpSet.put("NOTIZ", String.class);
 
         columnNames = tmpSet.keySet().toArray(new String[tmpSet.size()]);
         columnClasses = tmpSet.values().toArray(new Class[tmpSet.size()]);
@@ -193,6 +190,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Person row = persons.get(rowIndex);
+        String columnName = getColumnName(columnIndex);
         /*
         Method method = null;
         String retVal = null;
@@ -214,51 +212,54 @@ public class PersonCollection extends AbstractTableModel implements Serializable
         Logger.getLogger(PersonCollection.class.getName()).log(Level.SEVERE, null, ex);
         }
          */
-        switch (columnIndex) {
-            case 0:
+
+        switch (columnName) {
+            case "NAME":
                 return row.getNAME();
-            case 1:
+            case "AT":
                 return row.getAT();
-            case 2:
+            case "PA":
                 return row.getPA();
-            case 3:
+            case "INI":
                 return row.getINI();
-            case 4:
+            case "BASEINI":
                 return row.getBASEINI();
-            case 5:
+            case "RS":
                 return row.getRS();
-            case 6:
+            case "LP":
                 return row.getLP();
-            case 7:
+            case "MAXLP":
                 return row.getMAXLP();
-            case 8:
+            case "WUNDEN":
                 return row.getWUNDEN();
-            case 9:
+            case "WS":
                 return row.getWS();
-            case 10:
+            case "ASP":
                 return row.getASP();
-            case 11:
+            case "ALLY":
                 return row.getALLY();
-            case 12:
+            case "BONUSAKTIONEN":
                 return row.getAKTIONEN();
-            case 13:
+            case "KAMPF_GEGEN":
                 return row.getKAMPF_GEGEN();
-            case 14:
+            case "MR":
                 return row.getMR();
-            case 15:
+            case "AU":
                 return row.getAU();
-            case 16:
+            case "GS":
                 return row.getGS();
-            case 17:
+            case "TP":
                 return row.getTP();
-            case 18:
+            case "ANGEGRIFFEN":
                 return row.getAngegriffen();
-            case 19:
+            case "PARIERT":
                 return row.getPariert();
+            case "NOTIZ":
+                return row.getNotiz();
             default:
-                break;
+                throw new RuntimeException("Could not find row " + columnName);
         }
-        return null; //"BONUSAKTIONEN", "KAMPF_GEGEN", "MR", "AU", "GS", "TP"
+
     }
 
     @Override
@@ -278,6 +279,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        String columnName = getColumnName(columnIndex);
         ICommand redoit = null;
         ICommand undoit = null;
         boolean hasChanged = false;
@@ -294,8 +296,8 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             return; //tmp felder können nicht beschrieben werden, und nicht ini die man schreiben will
         }
 
-        switch (columnIndex) {
-            case 0:
+        switch (columnName) {
+            case "NAME":
                 int oldGen = row.getGeneration();
                 redoit = () -> {
                     row.setGeneration(0);
@@ -314,7 +316,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 //TODO auch redo?
 
                 break;
-            case 1:
+            case "AT":
                 redoit = () -> {
                     boolean b = row.setAT(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -327,7 +329,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 2:
+            case "PA":
                 redoit = () -> {
                     boolean b = row.setPA(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -340,7 +342,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 3:
+            case "INI":
                 redoit = () -> {
                     boolean b = row.setINI(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -353,7 +355,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 4:
+            case "BASEINI":
                 redoit = () -> {
                     boolean b = row.setBASEINI(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -366,7 +368,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 5:
+            case "RS":
                 redoit = () -> {
                     boolean b = row.setRS(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -379,7 +381,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 6:
+            case "LP":
                 redoit = () -> {
                     boolean b = row.setLP(value);
                     fireTableRowsUpdated(rowIndex, rowIndex);
@@ -392,7 +394,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 7:
+            case "MAXLP":
                 redoit = () -> {
                     boolean b = row.setMAXLP(value);
                     fireTableRowsUpdated(rowIndex, rowIndex);
@@ -405,7 +407,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 8:
+            case "WUNDEN":
                 redoit = () -> {
                     boolean b = row.setWUNDEN(value);
                     fireTableRowsUpdated(rowIndex, rowIndex);
@@ -418,7 +420,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 9:
+            case "WS":
                 redoit = () -> {
                     boolean b = row.setWS(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -431,7 +433,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 10:
+            case "ASP":
                 redoit = () -> {
                     boolean b = row.setASP(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -444,7 +446,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 11:
+            case "ALLY":
                 redoit = () -> {
                     boolean b = setPersonAlly(row, value);
                     fireTableRowsUpdated(rowIndex, rowIndex);
@@ -457,7 +459,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 12:
+            case "BONUSAKTIONEN":
                 final int aktionen;
                 try {
 
@@ -486,7 +488,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 } finally {
                     return;
                 }
-            case 13:
+            case "KAMPF_GEGEN":
                 redoit = () -> {
                     boolean b = row.setKAMPF_GEGEN(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -499,7 +501,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 14:
+            case "MR":
                 redoit = () -> {
                     boolean b = row.setMR(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -512,7 +514,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 15:
+            case "AU":
                 redoit = () -> {
                     boolean b = row.setAU(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -525,7 +527,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 16:
+            case "GS":
                 redoit = () -> {
                     boolean b = row.setGS(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -538,7 +540,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 17:
+            case "TP":
                 redoit = () -> {
                     boolean b = row.setTP(value);
                     fireTableRowsUpdated(rowIndex, rowIndex);
@@ -551,7 +553,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 18:
+            case "ANGEGRIFFEN":
                 redoit = () -> {
                     boolean b = row.setAngegriffen(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -564,7 +566,7 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
-            case 19:
+            case "PARIERT":
                 redoit = () -> {
                     boolean b = row.setPariert(value);
                     fireTableCellUpdated(rowIndex, columnIndex);
@@ -577,8 +579,21 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 };
                 hasChanged = redoit.apply();
                 break;
+            case "NOTIZ":
+                redoit = () -> {
+                    boolean b = row.setNotiz(value);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                undoit = () -> {
+                    boolean b = row.setNotiz(oldValue);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                    return b;
+                };
+                hasChanged = redoit.apply();
+                break;
             default:
-                break; //TODO return?
+                throw new RuntimeException("Could not find row " + columnName);
         }
 
         if (hasChanged) {
@@ -593,15 +608,19 @@ public class PersonCollection extends AbstractTableModel implements Serializable
             if (oldVal.equals("") || oldVal == null) {
                 oldVal = "nichts";
             }
-            if(oldVal.equals("true"))
-                    oldVal = "ja";
-            if(newval.equals("true"))
-                    newval = "ja";
-            if(oldVal.equals("false"))
+            if (oldVal.equals("true")) {
+                oldVal = "ja";
+            }
+            if (newval.equals("true")) {
+                newval = "ja";
+            }
+            if (oldVal.equals("false")) {
                 oldVal = "nein";
-            if(newval.equals("false"))
+            }
+            if (newval.equals("false")) {
                 newval = "nein";
-            
+            }
+
             String msg = row.getNAME() + " " + columnNames[columnIndex] + ": von " + oldVal + " auf " + newval + " geändert";
             TextLogger.getInstance().add(msg);
         }
@@ -872,5 +891,17 @@ public class PersonCollection extends AbstractTableModel implements Serializable
                 p.setPariert(false);
             }
         }
+    }
+
+    public String[] getColumnNames() {
+        return this.columnNames;
+    }
+
+    public int getColumnIndex(String columnName) {
+        int index = Arrays.asList(columnNames).indexOf(columnName);
+        if (index == -1) {
+            throw new RuntimeException("Index not found for column" + columnName);
+        }
+        return index;
     }
 }

@@ -62,6 +62,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import logic.IsInteger;
 
@@ -108,6 +109,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel roundLabel;
     private javax.swing.JTextField rundenInput;
     private javax.swing.JButton saveButton;
+    private JPopupMenu headerMenu;
     private RXTable table;
     private javax.swing.JList<String> erinnerungList;
     private JEditorPane textLog;
@@ -230,8 +232,8 @@ public class GUI extends javax.swing.JFrame {
         updatePersonModel();
 
         //hide the ally column
-        table.getColumnModel().getColumn(11).setMinWidth(0);
-        table.getColumnModel().getColumn(11).setMaxWidth(0);
+        table.getColumnModel().getColumn(personCollection.getColumnIndex("ALLY")).setMinWidth(0);
+        table.getColumnModel().getColumn(personCollection.getColumnIndex("ALLY")).setMaxWidth(0);
 
         dmgLabel = new javax.swing.JLabel();
         dmgInput = new javax.swing.JTextField(3);
@@ -267,9 +269,46 @@ public class GUI extends javax.swing.JFrame {
         saveSavedPersonButton = new javax.swing.JButton();
         loadSavedPersonButton = new javax.swing.JButton();
         helpButton = new JButton();
-
         jSeparator4 = new javax.swing.JSeparator();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        headerMenu = new JPopupMenu();
+        
+        
+          for (String s : personCollection.getColumnNames()) {
+            MenuItem item = new MenuItem(s);
+            int colIndex = personCollection.getColumnIndex(s);
+            TableColumn column = table.getColumnModel().getColumn(colIndex);
+            item.setColumn(column);
+            item.setMaxWidth(column.getMaxWidth());
+            item.setMinWidth(column.getMinWidth());
+            item.width = column.getPreferredWidth();
+
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    MenuItem item = (MenuItem) e.getSource();
+                    TableColumn column = item.getColumn();
+
+                    if (column.getPreferredWidth() == 0) {
+                        column.setMaxWidth(item.getMaxWidth());
+                        column.setMinWidth(item.getMinWidth());
+
+                        column.setPreferredWidth(item.width);
+                    } else {
+                        column.setMaxWidth(0);
+                        column.setMinWidth(0);
+                        column.setPreferredWidth(0);
+                    }
+
+
+                }
+
+            });
+
+            headerMenu.add(item);
+        }
+        
+        
         setTitle("Rohaldors Dojo");
 
         //logger = new TextLogger(textLog);
@@ -641,6 +680,16 @@ public class GUI extends javax.swing.JFrame {
     }
 
     private void setActionListeners() {
+        
+              table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent m) {
+
+                headerMenu.show(table.getTableHeader(), m.getX(), m.getY());
+
+            }
+
+        });
         
         
        

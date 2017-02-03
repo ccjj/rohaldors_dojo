@@ -27,7 +27,7 @@ public class Person implements Serializable, Cloneable {
     private Boolean pariert = false;
     private Boolean angegriffen = false;
     public final String UUID = java.util.UUID.randomUUID().toString();
-    
+    private String notiz;
     //TODO objekt für stats
     private final String fromVersion = Version.getVersion();
 
@@ -667,5 +667,29 @@ public class Person implements Serializable, Cloneable {
                 Boolean b =  (Boolean) value;
         setPariert(b);
         return true;
+    }
+
+    /**
+     * @return the notiz
+     */
+    public String getNotiz() {
+        return notiz;
+    }
+
+    /**
+     * @param notiz the notiz to set
+     */
+    public void setNotiz(String notiz) {
+        this.notiz = notiz;
+    }
+
+    Boolean setNotiz(Object value) {
+        String newVal = value.toString();
+        if(newVal.equals(this.getNotiz())){
+            return false;
+        }
+        setNotiz(newVal);
+        return true;
+       
     }
 }
