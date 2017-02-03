@@ -514,18 +514,21 @@ public class GUI extends javax.swing.JFrame {
         loadButton.setFocusable(false);
         loadButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         loadButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        loadButton.setToolTipText("Kampf laden");
         jToolBar1.add(loadButton);
 
         saveButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/save.png"))); // NOI18N
         saveButton.setFocusable(false);
         saveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         saveButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        saveButton.setToolTipText("Kampf speichern");
         jToolBar1.add(saveButton);
 
         undoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/undo.png"))); // NOI18N
         undoButton.setFocusable(false);
         undoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         undoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        undoButton.setToolTipText("undo");
         jToolBar1.add(undoButton);
 
         redoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/redo.png"))); // NOI18N
@@ -533,12 +536,14 @@ public class GUI extends javax.swing.JFrame {
         redoButton.setFocusable(false);
         redoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         redoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        redoButton.setToolTipText("redo");
         jToolBar1.add(redoButton);
 
         helpButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/questionmark.png"))); // NOI18N
         helpButton.setFocusable(false);
         helpButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         helpButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        helpButton.setToolTipText("Über das Programm");
         jToolBar1.add(helpButton);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
