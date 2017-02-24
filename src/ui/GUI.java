@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import logic.IsInteger;
+import java.util.concurrent.ThreadLocalRandom;
+import javax.swing.ListModel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -100,6 +103,8 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JList savedPersonList;
     private javax.swing.JButton loadButton;
+    private javax.swing.JButton d20Button;
+    private javax.swing.JButton d6Button;
     private javax.swing.JButton nextRoundButton;
     private javax.swing.JButton addSavedPersonButton;
     private javax.swing.JButton savePersonButton;
@@ -257,7 +262,7 @@ public class GUI extends javax.swing.JFrame {
         erinnerungField = new HintTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         jToolBar1 = new javax.swing.JToolBar();
- erinnerungList = new javax.swing.JList<>();
+        erinnerungList = new javax.swing.JList<String>();
         erinnerungInput = new javax.swing.JTextField(2);
         erinnerungButton = new javax.swing.JButton();
         textLog = new javax.swing.JEditorPane();
@@ -268,6 +273,8 @@ public class GUI extends javax.swing.JFrame {
         savedPersonLabel = new javax.swing.JLabel();
         saveSavedPersonButton = new javax.swing.JButton();
         loadSavedPersonButton = new javax.swing.JButton();
+        d6Button = new javax.swing.JButton();
+        d20Button = new javax.swing.JButton();
         helpButton = new JButton();
         jSeparator4 = new javax.swing.JSeparator();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -346,7 +353,8 @@ public class GUI extends javax.swing.JFrame {
 
         jScrollPane4.setViewportView(savedPersonList);
 
- 
+        d6Button.setText("W6 rollen");
+        d20Button.setText("W20 rollen");
 
         //loadButton.setSize(saveButton.getSize());
         erinnerungField.setHint("Erinnerung hier setzen");
@@ -371,7 +379,7 @@ public class GUI extends javax.swing.JFrame {
          erinnerungList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(erinnerungList);
 
-            javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+      javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -417,9 +425,7 @@ public class GUI extends javax.swing.JFrame {
                             .addComponent(jSeparator4)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(versionLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane4)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -443,7 +449,13 @@ public class GUI extends javax.swing.JFrame {
                                         .addComponent(nextRoundButton)
                                         .addGap(18, 18, 18)
                                         .addComponent(resetRoundButton)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(d6Button)
+                                .addGap(18, 18, 18)
+                                .addComponent(d20Button)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(versionLabel)))
                         .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
@@ -488,8 +500,12 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(saveSavedPersonButton)
                     .addComponent(loadSavedPersonButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(d6Button)
+                        .addComponent(d20Button)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jScrollPane2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -514,36 +530,30 @@ public class GUI extends javax.swing.JFrame {
         loadButton.setFocusable(false);
         loadButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         loadButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        loadButton.setToolTipText("Kampf laden");
         jToolBar1.add(loadButton);
 
         saveButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/save.png"))); // NOI18N
         saveButton.setFocusable(false);
         saveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         saveButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        saveButton.setToolTipText("Kampf speichern");
         jToolBar1.add(saveButton);
 
         undoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/undo.png"))); // NOI18N
         undoButton.setFocusable(false);
         undoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         undoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        undoButton.setToolTipText("undo");
         jToolBar1.add(undoButton);
 
         redoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/redo.png"))); // NOI18N
-        redoButton.setActionCommand("");
         redoButton.setFocusable(false);
         redoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         redoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        redoButton.setToolTipText("redo");
         jToolBar1.add(redoButton);
 
         helpButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/questionmark.png"))); // NOI18N
         helpButton.setFocusable(false);
         helpButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         helpButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        helpButton.setToolTipText("Über das Programm");
         jToolBar1.add(helpButton);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1002,6 +1012,25 @@ public class GUI extends javax.swing.JFrame {
 
             }
         });
+        
+        d6Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int d6 = ThreadLocalRandom.current().nextInt(1, 7);
+                                    TextLogger.getInstance().add("<b>" + d6 + "</b> gewürfelt mit einem W6-Würfel");
+
+            }
+        });
+                
+        d20Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                               int d20 = ThreadLocalRandom.current().nextInt(1, 7);
+                                    TextLogger.getInstance().add("<b>" + d20 + "</b> gewürfelt mit einem W20-Würfel");
+
+            }
+        });
+        
 
         undoButton.addActionListener(new ActionListener() {
             @Override
@@ -1159,6 +1188,18 @@ public class GUI extends javax.swing.JFrame {
             }
 
         });
+        
+         erinnerungList.addMouseMotionListener(new MouseMotionAdapter() {
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            JList l = (JList)e.getSource();
+            ListModel m = l.getModel();
+            int index = l.locationToIndex(e.getPoint());
+            if( index>-1 ) {
+                l.setToolTipText(ErinnerungCollection.getInstance().getElementAt(index).toString());
+            }
+        }
+    });
 
     }
 
