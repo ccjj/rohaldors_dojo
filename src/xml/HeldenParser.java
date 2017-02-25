@@ -6,6 +6,7 @@
 package xml;
 
 import easykampf.Person;
+import easykampf.TextLogger;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -58,11 +59,15 @@ public class HeldenParser {
                 NodeList nodes = (NodeList) xpath.evaluate("//processing-instruction()[name() = \"xml-stylesheet\"]", doc,
                 XPathConstants.NODESET);
         if (nodes.getLength() == 0) {
+             TextLogger.getInstance().add("Datei <b>" + fileName + "</b> ist keine gültige Helden-Datei", "red");
             return null;
         }
         
-        if(!nodes.item(0).getNodeValue().contains("helden.xsl"))
+        if(!nodes.item(0).getNodeValue().contains("helden.xsl")){
+            TextLogger.getInstance().add("Datei <b>" + fileName + "</b> ist keine gültige Helden-Datei", "red");
             return null;
+        }
+            
         
         
         //System.out.println(nodes.item(0).getNodeValue());
@@ -73,6 +78,7 @@ public class HeldenParser {
         nodes = (NodeList) xpath.evaluate("//helden/held/@name", doc,
                 XPathConstants.NODESET);
         if (nodes.getLength() == 0) {
+            TextLogger.getInstance().add("Datei <b>" + fileName + "</b> enthält keine gültigen Helden-Daten. Ist die Datei korrupt?", "red");
             return null;
         }
         String name = nodes.item(0).getNodeValue();
@@ -128,23 +134,6 @@ public class HeldenParser {
         
     }
 
-    /*
-    private static String getChildnodeValue(Element e, DefField f, String tagName) throws DOMException {
-        NodeList disNode;
-        int disLen;
-        disNode = e.getElementsByTagName(tagName);
-        disLen = disNode.getLength();
-        if (disLen > 0) {
-
-            String disHint = disNode.item(0).getAttributes().getNamedItem("Value").getNodeValue();
-            return disHint;
-        }
-        return null;
-    }
-
-
-     */
-    //name, mod, value
     private static void calcAttr(Person p, HashMap<String, String[]> aMap) {
         int ko = num(aMap.get("Konstitution")[1]);
         int kk = num(aMap.get("Körperkraft")[1]);
@@ -169,7 +158,7 @@ public class HeldenParser {
 
         // ws
         //TODO FK-wert, gs
-        int lp = Math.round((float) (ko * 2 + kk) / 2) + Integer.parseInt(lpArray[0]) + Integer.parseInt(lpArray[1]);
+        int lp = Math.round((float) (ko * 2 + kk) / 2) + num(lpArray[0]) + num(lpArray[1]);
         p.setLP(lp);
         p.setMAXLP(lp);
         int mr = num(mrArray[0]) + num(mrArray[1]) + Math.round((float) (mu + kl + ko) / 5);

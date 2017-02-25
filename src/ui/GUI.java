@@ -331,7 +331,7 @@ public class GUI extends javax.swing.JFrame {
 
         TextLogger.getInstance().setTextField(textLog);
         jScrollPane2.setViewportView(table);
-
+        jToolBar1.setFloatable(false);
         dmgLabel.setText("Schaden");
         dmgLabel.setFont(boldFont);
 
@@ -1306,6 +1306,7 @@ public class GUI extends javax.swing.JFrame {
         //todo
     }
 
+    /*
     public void showDetails(Person p) {
 
         final JFrame detailFrame = new JFrame(p.toString());
@@ -1344,16 +1345,12 @@ public class GUI extends javax.swing.JFrame {
         detailFrame.setVisible(true);
 
     }
+*/
+
 
     public void openDialog() {
         JFileChooser fc = new JFileChooser();
-        //JCheckBox cb= new JCheckBox("Automatically append extention");
-        //fc.setAccessory(cb);
-        //cb.setVisible(false);
-        //TODO assert ist heldendoc
         FileNameExtensionFilter xmlfilter = new FileNameExtensionFilter("Helden-Dateien", "xml");
-        //FileNameExtensionFilter odsfilter = new FileNameExtensionFilter("Open Office Tabellen", "ods");
-        //fc.setFileFilter(filter);
         fc.addChoosableFileFilter(xmlfilter);
         fc.setMultiSelectionEnabled(true);
         fc.setAcceptAllFileFilterUsed(false);
